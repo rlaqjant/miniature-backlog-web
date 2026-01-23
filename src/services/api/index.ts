@@ -1,3 +1,6 @@
 export { apiClient } from './client'
 export { authApi } from './auth.api'
 export { miniatureApi } from './miniature.api'
+export { backlogItemApi } from './backlogItem.api'
+export { progressLogApi } from './progressLog.api'
+export { imageApi } from './image.api'

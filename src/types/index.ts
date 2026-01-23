@@ -1,3 +1,5 @@
 export * from './auth.types'
 export * from './miniature.types'
 export * from './api.types'
+export * from './progressLog.types'
+export * from './image.types'

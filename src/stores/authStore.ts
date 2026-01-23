@@ -66,10 +66,11 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
-      // 민감한 정보는 제외하고 영속화
+      // user 정보도 함께 영속화 (새로고침 시 닉네임 유지)
       partialize: (state) => ({
         accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
+        user: state.user,
       }),
     }
   )

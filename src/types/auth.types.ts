@@ -2,7 +2,7 @@
  * 사용자 정보
  */
 export interface User {
-  id: string
+  id: number
   email: string
   nickname: string
   createdAt: string
@@ -12,6 +12,13 @@ export interface User {
  * 인증 토큰
  */
 export interface AuthTokens {
+  accessToken: string
+}
+
+/**
+ * 토큰 응답 (갱신 시)
+ */
+export interface TokenResponse {
   accessToken: string
 }
 
@@ -28,7 +35,7 @@ export interface LoginRequest {
  */
 export interface LoginResponse {
   accessToken: string
-  user?: User
+  user: User
 }
 
 /**

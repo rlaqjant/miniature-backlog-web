@@ -1,24 +1,34 @@
 /**
+ * API 응답 래퍼
+ */
+export interface ApiResponse<T> {
+  success: boolean
+  message?: string
+  data?: T
+  error?: ApiError
+  timestamp: string
+}
+
+/**
  * API 에러 응답
  */
 export interface ApiError {
-  status: number
+  code: string
   message: string
-  code?: string
-  details?: Record<string, string[]>
+  detail?: string
 }
 
 /**
  * 페이지네이션 응답
  */
-export interface PaginatedResponse<T> {
-  data: T[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }
+export interface PageResponse<T> {
+  content: T[]
+  page: number
+  size: number
+  totalElements: number
+  totalPages: number
+  hasNext: boolean
+  hasPrevious: boolean
 }
 
 /**
@@ -26,5 +36,5 @@ export interface PaginatedResponse<T> {
  */
 export interface PaginationParams {
   page?: number
-  limit?: number
+  size?: number
 }

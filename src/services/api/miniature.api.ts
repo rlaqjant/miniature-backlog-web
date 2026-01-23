@@ -21,7 +21,7 @@ export const miniatureApi = {
   /**
    * 백로그 상세 조회
    */
-  getById: async (id: string): Promise<MiniatureDetail> => {
+  getById: async (id: number): Promise<MiniatureDetail> => {
     const response = await apiClient.get<MiniatureDetail>(`/miniatures/${id}`)
     return response.data
   },
@@ -37,7 +37,7 @@ export const miniatureApi = {
   /**
    * 백로그 수정
    */
-  update: async (id: string, data: UpdateMiniatureRequest): Promise<Miniature> => {
+  update: async (id: number, data: UpdateMiniatureRequest): Promise<Miniature> => {
     const response = await apiClient.patch<Miniature>(`/miniatures/${id}`, data)
     return response.data
   },
@@ -45,7 +45,7 @@ export const miniatureApi = {
   /**
    * 백로그 삭제
    */
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/miniatures/${id}`)
   },
 }

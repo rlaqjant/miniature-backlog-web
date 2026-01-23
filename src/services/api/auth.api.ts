@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { LoginRequest, LoginResponse, RegisterRequest } from '@/types'
+import type { LoginRequest, LoginResponse, RegisterRequest, TokenResponse } from '@/types'
 
 /**
  * 인증 관련 API
@@ -23,8 +23,8 @@ export const authApi = {
   /**
    * 토큰 갱신
    */
-  refresh: async (): Promise<LoginResponse> => {
-    const response = await apiClient.post<LoginResponse>('/auth/refresh')
+  refresh: async (): Promise<TokenResponse> => {
+    const response = await apiClient.post<TokenResponse>('/auth/refresh')
     return response.data
   },
 }
