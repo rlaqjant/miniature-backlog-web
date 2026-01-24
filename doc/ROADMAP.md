@@ -12,7 +12,25 @@
 
 ---
 
-## 현재 진행률: 30%
+## 백엔드 API 연동 현황
+
+| 백엔드 API | 설명 | 프론트엔드 연동 | Phase |
+|-----------|------|---------------|-------|
+| `POST /auth/register` | 회원가입 | ✅ 완료 | Phase 2 |
+| `POST /auth/login` | 로그인 | ✅ 완료 | Phase 2 |
+| `GET /miniatures` | 백로그 목록 조회 | ✅ 완료 | Phase 4 |
+| `POST /miniatures` | 백로그 생성 | ✅ 완료 | Phase 4 |
+| `GET /miniatures/{id}` | 백로그 상세 조회 | 대기 중 | Phase 5 |
+| `PATCH /backlog-items/{id}` | 단계 상태 변경 | 대기 중 | Phase 5 |
+| `POST /progress-logs` | 진행 로그 작성 | 대기 중 | Phase 6 |
+| `GET /progress-logs` | 내 진행 로그 목록 | 대기 중 | Phase 5 |
+| `GET /public/progress-logs` | 공개 게시판 조회 | 대기 중 | Phase 7 |
+| `POST /images/presign` | presigned URL 발급 | 대기 중 | Phase 6 |
+| `POST /images` | 이미지 메타데이터 저장 | 대기 중 | Phase 6 |
+
+---
+
+## 현재 진행률: 48%
 
 ---
 
@@ -70,6 +88,14 @@ src/
 - 경로 별칭 설정 (@/, @components/, @pages/ 등)
 - Cloudflare Pages SPA 라우팅 지원 (_redirects)
 
+#### API 명세 기반 타입/서비스 레이어 (2026-01-24 추가)
+- `ApiResponse<T>`, `PageResponse<T>`, `ApiError` 구조 명세 일치
+- `BacklogItemStatus` 'NOT_STARTED' -> 'TODO' 변경
+- ID 타입 `string` -> `number` 변경 (Miniature, BacklogItem, User)
+- API 클라이언트 `ApiResponse` 래퍼 처리, 에러 코드(E2002/E2003) 구분
+- 신규 타입 파일: `progressLog.types.ts`, `image.types.ts`
+- 신규 API 서비스: `backlogItem.api.ts`, `progressLog.api.ts`, `image.api.ts`
+
 ---
 
 ## Phase 2: 인증 시스템 (Authentication) ✅ 완료
@@ -91,6 +117,9 @@ src/
 #### 생성된 파일
 ```
 src/
+├── components/
+│   └── auth/
+│       └── AuthInitializer.tsx  # 앱 시작 시 토큰 검증
 ├── pages/Auth/
 │   ├── LoginPage.tsx      # 로그인 페이지
 │   ├── RegisterPage.tsx   # 회원가입 페이지
@@ -107,6 +136,8 @@ src/
 - 비밀번호 확인 일치 여부 검증
 - 로그인 후 원래 페이지로 리다이렉트
 - 자동 토큰 갱신 (대기열 패턴 적용)
+- user 정보 localStorage 영속화
+- AuthInitializer를 통한 앱 시작 시 토큰 검증
 
 ---
 
@@ -125,27 +156,75 @@ src/
 
 ---
 
-## Phase 4: 개인 백로그 대시보드 (Dashboard)
+## Phase 4: 개인 백로그 대시보드 (Dashboard) ✅ 완료
+
+### 사용 API
+- `GET /miniatures` - 내 백로그 목록 조회
+- `POST /miniatures` - 새 백로그 생성
+
+### API 연동 작업
+- [x] `miniatureApi.getList()` 연동 확인
+- [x] `miniatureApi.create()` 연동 확인
 
 ### 완료된 항목
-(없음)
+- [x] 대시보드 레이아웃
+- [x] 미니어처 목록 조회 (GET /miniatures)
+- [x] 미니어처 카드 컴포넌트
+  - [x] 제목 표시
+  - [x] 현재 진행 단계 표시 (상태 배지)
+  - [x] 전체 진행률 시각화 (ProgressBar)
+- [x] 미니어처 추가 모달/폼 (POST /miniatures)
+- [x] 목록 필터링 및 정렬 (DashboardFilter)
+- [x] 빈 상태 UI (EmptyState)
+- [x] 로딩 상태 UI (Spinner)
+- [x] 에러 상태 UI (재시도 버튼 포함)
+
+### Phase 4 구현 내용 요약
+
+#### 생성된 파일
+```
+src/
+├── components/
+│   ├── common/
+│   │   ├── Modal/         # 포털 기반 모달 (ESC/배경 클릭 닫기)
+│   │   ├── Textarea/      # 텍스트에어리어 컴포넌트
+│   │   └── Select/        # 셀렉트 드롭다운 컴포넌트
+│   └── dashboard/
+│       ├── ProgressBar/   # 진행률 시각화
+│       ├── EmptyState/    # 빈 상태 UI
+│       ├── MiniatureCard/ # 백로그 카드
+│       ├── MiniatureList/ # 목록 컴포넌트 (로딩/에러/빈상태 분기)
+│       ├── DashboardFilter/ # 필터/정렬 드롭다운
+│       └── AddMiniatureModal/ # 백로그 추가 모달
+├── hooks/
+│   └── useMiniatures.ts   # 백로그 목록 관리 훅
+└── pages/
+    └── Dashboard/
+        └── DashboardPage.tsx  # 대시보드 메인 페이지
+```
+
+#### 주요 기능
+- useMiniatures 훅으로 API 호출/상태 관리 분리
+- 필터링: 전체/시작 전/진행 중/완료
+- 정렬: 최근 수정순/생성일순/이름순/진행률순
+- 반응형 그리드: 1열(모바일) → 2열(태블릿) → 3~4열(데스크탑)
 
 ### 진행 예정 항목
-- [ ] 대시보드 레이아웃
-- [ ] 미니어처 목록 조회 (GET /miniatures)
-- [ ] 미니어처 카드 컴포넌트
-  - [ ] 제목 표시
-  - [ ] 현재 진행 단계 표시
-  - [ ] 전체 진행률 시각화
-- [ ] 미니어처 추가 모달/폼 (POST /miniatures)
-- [ ] 목록 필터링 및 정렬
-- [ ] 빈 상태 UI (백로그 없을 때)
-- [ ] 로딩 상태 UI
-- [ ] 에러 상태 UI
+(없음)
 
 ---
 
 ## Phase 5: 백로그 상세 페이지 (Detail)
+
+### 사용 API
+- `GET /miniatures/{id}` - 백로그 상세 조회
+- `PATCH /backlog-items/{id}` - 단계 상태 변경
+- `GET /progress-logs?miniatureId={id}` - 해당 미니어처의 진행 로그
+
+### API 연동 작업
+- [x] `backlogItemApi.ts` 신규 생성
+- [x] `progressLogApi.ts` 신규 생성
+- [x] `BacklogItem` 타입 필드명 수정 (name→stepName, order→orderIndex)
 
 ### 완료된 항목
 (없음)
@@ -163,6 +242,15 @@ src/
 ---
 
 ## Phase 6: 진행 로그 및 이미지 업로드 (Progress Log)
+
+### 사용 API
+- `POST /progress-logs` - 진행 로그 작성
+- `POST /images/presign` - presigned URL 발급
+- `POST /images` - 이미지 메타데이터 저장
+
+### API 연동 작업
+- [x] `imageApi.ts` 신규 생성
+- [ ] R2 직접 업로드 로직 구현
 
 ### 완료된 항목
 (없음)
@@ -182,6 +270,12 @@ src/
 ---
 
 ## Phase 7: 공개 게시판 (Public Board)
+
+### 사용 API
+- `GET /public/progress-logs?page=0&size=20` - 공개 게시판 (페이지네이션)
+
+### API 연동 작업
+- [ ] `progressLogApi.getPublicLogs(page, size)` 구현
 
 ### 완료된 항목
 (없음)
@@ -266,6 +360,9 @@ src/
 | 2026-01-23 | 초기 로드맵 작성 |
 | 2026-01-23 | Phase 1 완료 - TypeScript, 라우팅, 상태관리, API 클라이언트, Tailwind CSS, 공통 컴포넌트 |
 | 2026-01-23 | Phase 2 완료 - 로그인/회원가입 UI, JWT 토큰 관리, 자동 갱신, useAuth 훅 |
+| 2026-01-23 | 백엔드 API 연동 현황 추가, Phase 4~7 API 매핑 추가 |
+| 2026-01-23 | Phase 4 완료 - 대시보드, 백로그 목록/추가, 필터/정렬, 상태 UI |
+| 2026-01-24 | API 명세 기반 타입/서비스 레이어 전면 수정 - ApiResponse 구조, ID 타입, 상태값 변경, 신규 API 서비스(backlogItem, progressLog, image) 추가, AuthInitializer 컴포넌트 추가 |
 
 ---
 
