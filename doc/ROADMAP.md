@@ -20,17 +20,17 @@
 | `POST /auth/login` | 로그인 | ✅ 완료 | Phase 2 |
 | `GET /miniatures` | 백로그 목록 조회 | ✅ 완료 | Phase 4 |
 | `POST /miniatures` | 백로그 생성 | ✅ 완료 | Phase 4 |
-| `GET /miniatures/{id}` | 백로그 상세 조회 | 대기 중 | Phase 5 |
-| `PATCH /backlog-items/{id}` | 단계 상태 변경 | 대기 중 | Phase 5 |
+| `GET /miniatures/{id}` | 백로그 상세 조회 | ✅ 완료 | Phase 5 |
+| `PATCH /backlog-items/{id}` | 단계 상태 변경 | ✅ 완료 | Phase 5 |
 | `POST /progress-logs` | 진행 로그 작성 | 대기 중 | Phase 6 |
-| `GET /progress-logs` | 내 진행 로그 목록 | 대기 중 | Phase 5 |
+| `GET /progress-logs` | 내 진행 로그 목록 | ✅ 완료 | Phase 5 |
 | `GET /public/progress-logs` | 공개 게시판 조회 | 대기 중 | Phase 7 |
 | `POST /images/presign` | presigned URL 발급 | 대기 중 | Phase 6 |
 | `POST /images` | 이미지 메타데이터 저장 | 대기 중 | Phase 6 |
 
 ---
 
-## 현재 진행률: 48%
+## 현재 진행률: 60%
 
 ---
 
@@ -214,7 +214,7 @@ src/
 
 ---
 
-## Phase 5: 백로그 상세 페이지 (Detail)
+## Phase 5: 백로그 상세 페이지 (Detail) ✅ 완료
 
 ### 사용 API
 - `GET /miniatures/{id}` - 백로그 상세 조회
@@ -225,19 +225,52 @@ src/
 - [x] `backlogItemApi.ts` 신규 생성
 - [x] `progressLogApi.ts` 신규 생성
 - [x] `BacklogItem` 타입 필드명 수정 (name→stepName, order→orderIndex)
+- [x] `progressLogApi` 엔드포인트 수정 (API 명세 기준)
 
 ### 완료된 항목
-(없음)
+- [x] 상세 페이지 레이아웃 (GET /miniatures/{id})
+- [x] 미니어처 정보 표시 섹션 (MiniatureInfo)
+- [x] 단계별 진행 상태 UI (BacklogSteps)
+- [x] 단계 상태 변경 기능 (PATCH /backlog-items/{id})
+- [x] 진행 로그 목록 표시 (ProgressLogList)
+- [x] 공개 여부 설정 토글
+- [x] 미니어처 수정 기능 (EditMiniatureModal)
+- [x] 미니어처 삭제 기능 (DeleteConfirmModal)
+
+### Phase 5 구현 내용 요약
+
+#### 생성된 파일
+```
+src/
+├── components/
+│   └── detail/
+│       ├── MiniatureInfo.tsx      # 기본 정보 + 공개 토글 + 수정/삭제 버튼
+│       ├── BacklogSteps.tsx       # 5단계 백로그 상태 관리 (TODO→IN_PROGRESS→DONE)
+│       ├── ProgressLogList.tsx    # 진행 로그 타임라인 표시
+│       ├── EditMiniatureModal.tsx # 제목/설명 수정 모달
+│       ├── DeleteConfirmModal.tsx # 삭제 확인 모달
+│       └── index.ts
+├── hooks/
+│   └── useMiniatureDetail.ts      # 상세 조회, 상태 변경, 수정, 삭제 훅
+└── pages/
+    └── Detail/
+        ├── MiniatureDetailPage.tsx # 상세 페이지
+        └── index.ts
+```
+
+#### 주요 기능
+- useMiniatureDetail 훅으로 API 호출/상태 관리 분리
+- 백로그 단계 클릭 시 상태 순환 (TODO → IN_PROGRESS → DONE → TODO)
+- 공개/비공개 토글 스위치
+- 수정/삭제 모달 (포털 기반)
+- 진행 로그 타임라인 UI
+- 뒤로가기 네비게이션
+
+#### 라우트 추가
+- `/miniatures/:id` - 상세 페이지 (ProtectedRoute)
 
 ### 진행 예정 항목
-- [ ] 상세 페이지 레이아웃 (GET /miniatures/{id})
-- [ ] 미니어처 정보 표시 섹션
-- [ ] 단계별 진행 상태 UI (BacklogItem)
-- [ ] 단계 상태 변경 기능 (PATCH /backlog-items/{id})
-- [ ] 진행 로그 목록 표시
-- [ ] 공개 여부 설정 토글
-- [ ] 미니어처 수정 기능
-- [ ] 미니어처 삭제 기능
+(없음)
 
 ---
 
@@ -347,7 +380,7 @@ src/
 | 마일스톤 | 목표 기능 | 상태 |
 |---------|----------|------|
 | M1 - MVP 기반 | Phase 1~2 완료 (프로젝트 설정 + 인증) | ✅ 완료 |
-| M2 - 핵심 기능 | Phase 3~5 완료 (랜딩 + 대시보드 + 상세) | 예정 |
+| M2 - 핵심 기능 | Phase 3~5 완료 (랜딩 + 대시보드 + 상세) | ✅ 완료 |
 | M3 - 완전 기능 | Phase 6~7 완료 (로그 + 공개 게시판) | 예정 |
 | M4 - 정식 출시 | Phase 8~9 완료 (고도화 + 배포) | 예정 |
 
@@ -363,6 +396,7 @@ src/
 | 2026-01-23 | 백엔드 API 연동 현황 추가, Phase 4~7 API 매핑 추가 |
 | 2026-01-23 | Phase 4 완료 - 대시보드, 백로그 목록/추가, 필터/정렬, 상태 UI |
 | 2026-01-24 | API 명세 기반 타입/서비스 레이어 전면 수정 - ApiResponse 구조, ID 타입, 상태값 변경, 신규 API 서비스(backlogItem, progressLog, image) 추가, AuthInitializer 컴포넌트 추가 |
+| 2026-01-24 | Phase 5 완료 - 백로그 상세 페이지, 단계 상태 관리, 진행 로그 목록, 수정/삭제 기능, progressLog API 엔드포인트 수정 |
 
 ---
 
