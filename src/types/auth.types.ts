@@ -9,20 +9,6 @@ export interface User {
 }
 
 /**
- * 인증 토큰
- */
-export interface AuthTokens {
-  accessToken: string
-}
-
-/**
- * 토큰 응답 (갱신 시)
- */
-export interface TokenResponse {
-  accessToken: string
-}
-
-/**
  * 로그인 요청
  */
 export interface LoginRequest {
@@ -32,10 +18,11 @@ export interface LoginRequest {
 
 /**
  * 로그인 응답
+ * 토큰은 httpOnly 쿠키로 전달됨
+ * 참고: API 명세상 user 정보는 응답에 포함되지 않음
  */
 export interface LoginResponse {
-  accessToken: string
-  user: User
+  user?: User
 }
 
 /**

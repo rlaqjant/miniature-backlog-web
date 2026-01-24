@@ -12,6 +12,7 @@ const ERROR_CODES = {
 /**
  * Axios 인스턴스 생성
  * 기본 URL 및 공통 설정 적용
+ * withCredentials: httpOnly 쿠키 자동 전송/수신
  */
 export const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
@@ -19,48 +20,30 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 })
 
 // 토큰 갱신 중인지 추적
 let isRefreshing = false
 // 토큰 갱신 대기 중인 요청들
 let failedQueue: Array<{
-  resolve: (token: string | null) => void
+  resolve: () => void
   reject: (error: Error) => void
 }> = []
 
 /**
  * 대기 중인 요청들 처리
  */
-const processQueue = (error: Error | null, token: string | null = null) => {
+const processQueue = (error: Error | null) => {
   failedQueue.forEach((promise) => {
     if (error) {
       promise.reject(error)
     } else {
-      promise.resolve(token)
+      promise.resolve()
     }
   })
   failedQueue = []
 }
-
-/**
- * 요청 인터셉터
- * - JWT 토큰 자동 첨부
- */
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const accessToken = useAuthStore.getState().accessToken
-
-    if (accessToken && config.headers) {
-      config.headers.Authorization = `Bearer ${accessToken}`
-    }
-
-    return config
-  },
-  (error: AxiosError) => {
-    return Promise.reject(error)
-  }
-)
 
 /**
  * 응답 인터셉터
@@ -71,8 +54,10 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response: AxiosResponse<ApiResponse<unknown>>) => {
     // ApiResponse 래퍼에서 data 추출
+    // 참고: 로그인/로그아웃 등 일부 API는 data 필드가 없음 (success, message만 반환)
     if (response.data && typeof response.data === 'object' && 'success' in response.data) {
-      response.data = response.data.data as typeof response.data
+      // data 필드가 있으면 추출, 없으면 빈 객체 반환
+      response.data = (response.data.data ?? {}) as typeof response.data
     }
     return response
   },
@@ -94,12 +79,9 @@ apiClient.interceptors.response.use(
       // 이미 갱신 중인 경우 대기열에 추가
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject })
+          failedQueue.push({ resolve: () => resolve(undefined), reject })
         })
-          .then((token) => {
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`
-            }
+          .then(() => {
             return apiClient(originalRequest)
           })
           .catch((err) => Promise.reject(err))
@@ -109,24 +91,17 @@ apiClient.interceptors.response.use(
       isRefreshing = true
 
       try {
-        // 토큰 갱신 요청
-        const response = await apiClient.post('/auth/refresh')
-        const accessToken = response.data?.accessToken || response.data
-
-        // 새 토큰 저장
-        useAuthStore.getState().setAccessToken(accessToken)
+        // 토큰 갱신 요청 (쿠키 자동 전송/수신)
+        await apiClient.post('/auth/refresh')
 
         // 대기 중인 요청들 처리
-        processQueue(null, accessToken)
+        processQueue(null)
 
         // 원래 요청 재시도
-        if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`
-        }
         return apiClient(originalRequest)
       } catch (refreshError) {
         // 갱신 실패 시 로그아웃
-        processQueue(refreshError as Error, null)
+        processQueue(refreshError as Error)
         useAuthStore.getState().logout()
         return Promise.reject(refreshError)
       } finally {

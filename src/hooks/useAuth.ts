@@ -21,6 +21,7 @@ export function useAuth() {
 
   /**
    * 로그인
+   * 토큰은 httpOnly 쿠키로 서버에서 설정됨
    */
   const login = useCallback(async (data: LoginRequest, redirectTo?: string) => {
     setLoading(true)
@@ -29,12 +30,11 @@ export function useAuth() {
 
       storeLogin(
         response.user || {
-          id: '',
+          id: 0,
           email: data.email,
           nickname: data.email.split('@')[0],
           createdAt: new Date().toISOString(),
-        },
-        { accessToken: response.accessToken }
+        }
       )
 
       if (redirectTo) {
@@ -54,8 +54,14 @@ export function useAuth() {
 
   /**
    * 로그아웃
+   * 서버에 로그아웃 요청하여 쿠키 삭제
    */
-  const logout = useCallback((redirectTo = '/') => {
+  const logout = useCallback(async (redirectTo = '/') => {
+    try {
+      await authApi.logout()
+    } catch {
+      // 로그아웃 API 실패해도 클라이언트 상태는 초기화
+    }
     storeLogout()
     navigate(redirectTo, { replace: true })
   }, [navigate, storeLogout])

@@ -1,12 +1,10 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import type { User, AuthTokens } from '@/types'
+import type { User } from '@/types'
 
 interface AuthState {
   /** 현재 로그인한 사용자 정보 */
   user: User | null
-  /** 액세스 토큰 */
-  accessToken: string | null
   /** 인증 여부 */
   isAuthenticated: boolean
   /** 로딩 상태 */
@@ -15,11 +13,9 @@ interface AuthState {
 
 interface AuthActions {
   /** 로그인 처리 */
-  login: (user: User, tokens: AuthTokens) => void
+  login: (user: User) => void
   /** 로그아웃 처리 */
   logout: () => void
-  /** 토큰 갱신 */
-  setAccessToken: (token: string) => void
   /** 로딩 상태 설정 */
   setLoading: (loading: boolean) => void
 }
@@ -28,24 +24,22 @@ type AuthStore = AuthState & AuthActions
 
 const initialState: AuthState = {
   user: null,
-  accessToken: null,
   isAuthenticated: false,
   isLoading: false,
 }
 
 /**
  * 인증 상태 관리 스토어
- * localStorage에 토큰 정보 영속화
+ * 토큰은 httpOnly 쿠키에서 관리되며, 사용자 정보만 localStorage에 영속화
  */
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       ...initialState,
 
-      login: (user, tokens) => {
+      login: (user) => {
         set({
           user,
-          accessToken: tokens.accessToken,
           isAuthenticated: true,
           isLoading: false,
         })
@@ -55,10 +49,6 @@ export const useAuthStore = create<AuthStore>()(
         set(initialState)
       },
 
-      setAccessToken: (token) => {
-        set({ accessToken: token })
-      },
-
       setLoading: (loading) => {
         set({ isLoading: loading })
       },
@@ -66,9 +56,8 @@ export const useAuthStore = create<AuthStore>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
-      // user 정보도 함께 영속화 (새로고침 시 닉네임 유지)
+      // user 정보만 영속화 (토큰은 httpOnly 쿠키로 관리)
       partialize: (state) => ({
-        accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
         user: state.user,
       }),
