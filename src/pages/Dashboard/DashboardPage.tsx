@@ -53,6 +53,7 @@ function sortMiniatures(miniatures: Miniature[], sort: SortOption): Miniature[] 
 
 /**
  * 대시보드 페이지
+ * 자연주의 프리미엄 디자인 시스템
  */
 export function DashboardPage() {
   const navigate = useNavigate()
@@ -73,7 +74,7 @@ export function DashboardPage() {
   }, [miniatures, filterBy, sortBy])
 
   // 카드 클릭 핸들러
-  const handleCardClick = (id: string) => {
+  const handleCardClick = (id: number) => {
     navigate(`/miniatures/${id}`)
   }
 
@@ -82,14 +83,14 @@ export function DashboardPage() {
   const closeModal = () => setIsModalOpen(false)
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-6 py-12">
       {/* 헤더 */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="font-display text-3xl font-bold text-charcoal-900 dark:text-cream-50">
             내 백로그
           </h1>
-          <p className="mt-1 text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-stone-500">
             도색할 미니어처를 관리하세요
           </p>
         </div>
@@ -100,7 +101,7 @@ export function DashboardPage() {
 
       {/* 필터/정렬 */}
       {miniatures.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-8">
           <DashboardFilter
             sortBy={sortBy}
             onSortChange={setSortBy}

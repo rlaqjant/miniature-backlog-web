@@ -5,19 +5,20 @@ import { Button } from '@/components/common'
 
 /**
  * 애플리케이션 헤더 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  */
 export function Header() {
   const { isAuthenticated, user, logout } = useAuthStore()
   const { toggleSidebar } = useUIStore()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:border-gray-800 dark:bg-gray-950/95">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-cream-200 bg-cream-50/95 backdrop-blur supports-[backdrop-filter]:bg-cream-50/80 dark:border-charcoal-500 dark:bg-[#1a1814]/95">
+      <div className="container mx-auto flex h-[72px] items-center justify-between px-6">
         {/* 로고 */}
         <div className="flex items-center gap-4">
           <button
             type="button"
-            className="lg:hidden"
+            className="lg:hidden text-charcoal-500 hover:text-forest-500 transition-colors"
             onClick={toggleSidebar}
             aria-label="메뉴 열기"
           >
@@ -26,17 +27,19 @@ export function Header() {
 
           <Link
             to="/"
-            className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white"
+            className="flex items-center gap-2"
           >
-            <span>SinTower</span>
+            <span className="font-display text-2xl font-bold text-forest-600 dark:text-forest-400">
+              SinTower
+            </span>
           </Link>
         </div>
 
         {/* 네비게이션 */}
-        <nav className="hidden lg:flex items-center gap-6">
+        <nav className="hidden lg:flex items-center gap-8">
           <Link
             to="/board"
-            className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
           >
             공개 게시판
           </Link>
@@ -44,7 +47,7 @@ export function Header() {
           {isAuthenticated && (
             <Link
               to="/dashboard"
-              className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
             >
               내 백로그
             </Link>
@@ -55,7 +58,7 @@ export function Header() {
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm font-medium text-charcoal-500 dark:text-cream-200">
                 {user?.nickname}님
               </span>
               <Button variant="outline" size="sm" onClick={logout}>
@@ -65,10 +68,10 @@ export function Header() {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="outline" size="sm">로그인</Button>
+                <Button variant="ghost" size="sm">로그인</Button>
               </Link>
               <Link to="/register">
-                <Button size="sm">회원가입</Button>
+                <Button variant="primary" size="sm">회원가입</Button>
               </Link>
             </>
           )}

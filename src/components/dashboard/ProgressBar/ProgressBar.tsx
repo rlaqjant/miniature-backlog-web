@@ -11,24 +11,33 @@ interface ProgressBarProps {
 
 const sizeStyles = {
   sm: 'h-1.5',
-  md: 'h-2.5',
-  lg: 'h-4',
+  md: 'h-2',
+  lg: 'h-3',
 }
 
+/**
+ * 진행률에 따른 색상 결정 (자연주의 팔레트)
+ * 0-30%: 테라코타 (시작 단계)
+ * 31-70%: 골드 (진행 중)
+ * 71-99%: 포레스트 라이트 (마무리 단계)
+ * 100%: 포레스트 (완료)
+ */
 const getColorByProgress = (value: number): string => {
-  if (value === 100) return 'bg-green-500'
-  if (value >= 50) return 'bg-indigo-500'
-  return 'bg-amber-500'
+  if (value === 100) return 'bg-forest-500'
+  if (value >= 71) return 'bg-forest-400'
+  if (value >= 31) return 'bg-gold-500'
+  return 'bg-terracotta-500'
 }
 
 const colorStyles = {
-  primary: 'bg-indigo-500',
-  success: 'bg-green-500',
-  warning: 'bg-amber-500',
+  primary: 'bg-forest-500',
+  success: 'bg-forest-500',
+  warning: 'bg-gold-500',
 }
 
 /**
  * 진행률 바 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  */
 export function ProgressBar({
   value,
@@ -46,19 +55,19 @@ export function ProgressBar({
   return (
     <div className="w-full">
       <div
-        className={`w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 ${sizeStyles[size]}`}
+        className={`w-full overflow-hidden rounded-full bg-cream-200 dark:bg-charcoal-500 ${sizeStyles[size]}`}
         role="progressbar"
         aria-valuenow={clampedValue}
         aria-valuemin={0}
         aria-valuemax={100}
       >
         <div
-          className={`${sizeStyles[size]} ${barColor} transition-all duration-300 ease-out`}
+          className={`${sizeStyles[size]} ${barColor} rounded-full transition-all duration-500 ease-out`}
           style={{ width: `${clampedValue}%` }}
         />
       </div>
       {showPercent && (
-        <span className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        <span className="mt-1.5 block text-xs font-medium text-stone-500">
           {clampedValue}%
         </span>
       )}

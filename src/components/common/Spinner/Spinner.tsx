@@ -14,13 +14,14 @@ const sizeStyles = {
 }
 
 const colorStyles = {
-  primary: 'text-indigo-600',
-  white: 'text-white',
-  gray: 'text-gray-400',
+  primary: 'text-forest-500',
+  white: 'text-cream-50',
+  gray: 'text-stone-500',
 }
 
 /**
  * 로딩 스피너 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  */
 export function Spinner({
   size = 'md',
@@ -28,7 +29,7 @@ export function Spinner({
   label,
 }: SpinnerProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2" role="status">
+    <div className="flex flex-col items-center justify-center gap-3" role="status">
       <svg
         className={`animate-spin ${sizeStyles[size]} ${colorStyles[color]}`}
         fill="none"
@@ -50,7 +51,7 @@ export function Spinner({
         />
       </svg>
       {label && (
-        <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
+        <span className="text-sm font-medium text-stone-500">{label}</span>
       )}
       <span className="sr-only">로딩 중...</span>
     </div>

@@ -1,6 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'accent' | 'danger'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -19,21 +19,23 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500',
-  secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
-  outline: 'border-2 border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800',
-  ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-300 dark:hover:bg-gray-800',
-  danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+  primary: 'bg-forest-500 text-cream-50 hover:bg-forest-400 focus:ring-forest-500/30 dark:bg-forest-500 dark:hover:bg-forest-400',
+  secondary: 'bg-cream-200 text-charcoal-500 hover:bg-cream-300 focus:ring-cream-400/30 dark:bg-charcoal-500 dark:text-cream-100 dark:hover:bg-charcoal-500/80',
+  outline: 'border-2 border-cream-300 text-charcoal-500 hover:bg-cream-100 focus:ring-forest-500/20 dark:border-charcoal-500 dark:text-cream-200 dark:hover:bg-charcoal-500/30',
+  ghost: 'text-forest-500 hover:bg-forest-100 focus:ring-forest-500/20 dark:text-forest-300 dark:hover:bg-forest-900/30',
+  accent: 'bg-gold-500 text-charcoal-900 hover:bg-gold-600 focus:ring-gold-500/30',
+  danger: 'bg-[#c75f5f] text-cream-50 hover:bg-[#b54f4f] focus:ring-[#c75f5f]/30',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-6 py-3 text-lg',
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-2.5 text-base',
+  lg: 'px-8 py-3 text-lg',
 }
 
 /**
  * 공통 버튼 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -59,9 +61,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         className={`
           inline-flex items-center justify-center gap-2
-          rounded-lg font-medium
-          transition-colors duration-200
-          focus:outline-none focus:ring-2 focus:ring-offset-2
+          rounded-lg font-semibold
+          transition-all duration-200
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cream-50
+          dark:focus:ring-offset-charcoal-900
           disabled:cursor-not-allowed disabled:opacity-50
           ${variantStyles[variant]}
           ${sizeStyles[size]}

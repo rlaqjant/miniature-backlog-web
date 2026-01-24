@@ -20,6 +20,7 @@ const paddingStyles = {
 
 /**
  * 공통 카드 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  */
 export function Card({
   padding = 'md',
@@ -33,16 +34,17 @@ export function Card({
   return (
     <div
       className={`
-        overflow-hidden rounded-xl border border-gray-200 bg-white
-        dark:border-gray-700 dark:bg-gray-800
-        ${hoverable ? 'transition-shadow duration-200 hover:shadow-lg' : ''}
+        overflow-hidden rounded-2xl border border-cream-200 bg-cream-100
+        shadow-soft
+        dark:border-charcoal-500 dark:bg-[#252219]
+        ${hoverable ? 'transition-all duration-300 hover:shadow-soft-lg hover:-translate-y-0.5' : ''}
         ${className}
       `}
       {...props}
     >
       {/* 헤더 */}
       {header && (
-        <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+        <div className="border-b border-cream-200 px-6 py-4 dark:border-charcoal-500">
           {header}
         </div>
       )}
@@ -54,7 +56,7 @@ export function Card({
 
       {/* 푸터 */}
       {footer && (
-        <div className="border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+        <div className="border-t border-cream-200 px-6 py-4 dark:border-charcoal-500">
           {footer}
         </div>
       )}

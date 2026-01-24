@@ -11,7 +11,7 @@ interface MiniatureListProps {
   /** 에러 메시지 */
   error: string | null
   /** 카드 클릭 핸들러 */
-  onCardClick?: (id: string) => void
+  onCardClick?: (id: number) => void
   /** 빈 상태 액션 핸들러 */
   onEmptyAction?: () => void
   /** 재시도 핸들러 */
@@ -20,6 +20,7 @@ interface MiniatureListProps {
 
 /**
  * 미니어처 목록 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  * - 로딩/에러/빈 상태/목록 조건부 렌더링
  */
 export function MiniatureList({
@@ -33,7 +34,7 @@ export function MiniatureList({
   // 로딩 상태
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
+      <div className="flex justify-center py-16">
         <Spinner size="lg" label="백로그를 불러오는 중..." />
       </div>
     )
@@ -42,9 +43,9 @@ export function MiniatureList({
   // 에러 상태
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-lg bg-red-50 px-6 py-12 dark:bg-red-900/20">
+      <div className="flex flex-col items-center justify-center rounded-2xl bg-[#c75f5f]/10 px-8 py-16 dark:bg-[#c75f5f]/5">
         <svg
-          className="mb-4 h-12 w-12 text-red-400"
+          className="mb-4 h-12 w-12 text-[#c75f5f]"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -56,10 +57,10 @@ export function MiniatureList({
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
           />
         </svg>
-        <h3 className="mb-2 text-lg font-medium text-red-800 dark:text-red-200">
+        <h3 className="font-display mb-2 text-lg font-semibold text-[#c75f5f]">
           오류가 발생했습니다
         </h3>
-        <p className="mb-4 text-center text-red-600 dark:text-red-300">{error}</p>
+        <p className="mb-6 text-center text-[#c75f5f]/80">{error}</p>
         {onRetry && (
           <Button variant="outline" onClick={onRetry}>
             다시 시도
@@ -76,7 +77,7 @@ export function MiniatureList({
 
   // 목록 렌더링
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {miniatures.map((miniature) => (
         <MiniatureCard
           key={miniature.id}

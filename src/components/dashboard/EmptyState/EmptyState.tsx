@@ -13,6 +13,7 @@ interface EmptyStateProps {
 
 /**
  * 빈 상태 UI 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  */
 export function EmptyState({
   title = '백로그가 없습니다',
@@ -21,11 +22,11 @@ export function EmptyState({
   onAction,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 py-12 dark:border-gray-600">
+    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-cream-300 bg-cream-50 px-8 py-16 dark:border-charcoal-500 dark:bg-[#1a1814]">
       {/* 아이콘 */}
-      <div className="mb-4 rounded-full bg-gray-100 p-4 dark:bg-gray-800">
+      <div className="mb-6 rounded-full bg-cream-200 p-5 dark:bg-charcoal-500">
         <svg
-          className="h-12 w-12 text-gray-400"
+          className="h-12 w-12 text-forest-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -40,10 +41,10 @@ export function EmptyState({
       </div>
 
       {/* 텍스트 */}
-      <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
+      <h3 className="font-display mb-3 text-xl font-semibold text-charcoal-900 dark:text-cream-50">
         {title}
       </h3>
-      <p className="mb-6 text-center text-gray-500 dark:text-gray-400">
+      <p className="mb-8 max-w-sm text-center text-stone-500">
         {description}
       </p>
 

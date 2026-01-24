@@ -22,6 +22,7 @@ const sizeStyles = {
 
 /**
  * 포털 기반 모달 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  * - ESC 키로 닫기
  * - 배경 클릭으로 닫기
  * - 포커스 트랩
@@ -77,7 +78,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-charcoal-900/60 p-4 backdrop-blur-sm"
       onClick={handleBackdropClick}
       aria-modal="true"
       role="dialog"
@@ -88,24 +89,24 @@ export function Modal({
         tabIndex={-1}
         className={`
           w-full ${sizeStyles[size]}
-          rounded-lg bg-white shadow-xl
-          dark:bg-gray-800
+          rounded-2xl bg-cream-50 shadow-soft-lg
+          dark:bg-[#252219]
           focus:outline-none
         `}
       >
         {/* 헤더 */}
         {title && (
-          <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+          <div className="flex items-center justify-between border-b border-cream-200 px-6 py-5 dark:border-charcoal-500">
             <h2
               id="modal-title"
-              className="text-lg font-semibold text-gray-900 dark:text-white"
+              className="font-display text-xl font-semibold text-charcoal-900 dark:text-cream-50"
             >
               {title}
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 dark:hover:bg-gray-700"
+              className="rounded-lg p-2 text-stone-500 hover:bg-cream-200 hover:text-charcoal-500 transition-colors dark:hover:bg-charcoal-500"
               aria-label="닫기"
             >
               <svg
@@ -126,7 +127,7 @@ export function Modal({
         )}
 
         {/* 본문 */}
-        <div className="px-6 py-4">{children}</div>
+        <div className="px-6 py-5">{children}</div>
       </div>
     </div>,
     document.body

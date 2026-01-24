@@ -6,28 +6,28 @@ interface MiniatureCardProps {
   /** 미니어처 데이터 */
   miniature: Miniature
   /** 클릭 핸들러 */
-  onClick?: (id: string) => void
+  onClick?: (id: number) => void
 }
 
 /**
- * 진행 상태에 따른 배지 색상
+ * 진행 상태에 따른 배지 스타일 (자연주의 팔레트)
  */
 function getStatusBadge(progress: number) {
   if (progress === 0) {
     return {
       text: '시작 전',
-      className: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+      className: 'bg-cream-200 text-charcoal-500 dark:bg-charcoal-500 dark:text-cream-200',
     }
   }
   if (progress === 100) {
     return {
       text: '완료',
-      className: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+      className: 'bg-forest-100 text-forest-600 dark:bg-forest-900/30 dark:text-forest-300',
     }
   }
   return {
     text: '진행 중',
-    className: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300',
+    className: 'bg-gold-500/20 text-gold-600 dark:bg-gold-500/20 dark:text-gold-400',
   }
 }
 
@@ -45,6 +45,7 @@ function formatDate(dateString: string): string {
 
 /**
  * 미니어처 카드 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  */
 export function MiniatureCard({ miniature, onClick }: MiniatureCardProps) {
   const { id, title, progress, updatedAt, isPublic } = miniature
@@ -58,27 +59,28 @@ export function MiniatureCard({ miniature, onClick }: MiniatureCardProps) {
 
   return (
     <Card
-      className="cursor-pointer transition-shadow hover:shadow-lg"
+      className="cursor-pointer group"
+      hoverable
       onClick={handleClick}
     >
-      <div className="p-4">
+      <div className="p-5">
         {/* 헤더: 제목 + 상태 배지 */}
-        <div className="mb-3 flex items-start justify-between gap-2">
-          <h3 className="line-clamp-2 flex-1 font-medium text-gray-900 dark:text-white">
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <h3 className="font-display line-clamp-2 flex-1 text-lg font-semibold text-charcoal-900 group-hover:text-forest-500 transition-colors dark:text-cream-50">
             {title}
           </h3>
           <span
-            className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge.className}`}
+            className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-medium ${statusBadge.className}`}
           >
             {statusBadge.text}
           </span>
         </div>
 
         {/* 진행률 바 */}
-        <div className="mb-3">
-          <div className="mb-1 flex items-center justify-between text-sm">
-            <span className="text-gray-500 dark:text-gray-400">진행률</span>
-            <span className="font-medium text-gray-700 dark:text-gray-300">
+        <div className="mb-4">
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <span className="text-stone-500">진행률</span>
+            <span className="font-semibold text-charcoal-500 dark:text-cream-200">
               {progress}%
             </span>
           </div>
@@ -86,10 +88,10 @@ export function MiniatureCard({ miniature, onClick }: MiniatureCardProps) {
         </div>
 
         {/* 푸터: 날짜 + 공개 여부 */}
-        <div className="flex items-center justify-between text-xs text-gray-400">
+        <div className="flex items-center justify-between text-xs text-stone-500">
           <span>{formatDate(updatedAt)}</span>
           {isPublic && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 text-forest-500">
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   strokeLinecap="round"

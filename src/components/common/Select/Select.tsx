@@ -22,6 +22,7 @@ interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'chi
 
 /**
  * 공통 셀렉트 컴포넌트
+ * 자연주의 프리미엄 디자인 시스템
  */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   (
@@ -48,7 +49,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+            className="mb-2 block text-sm font-medium text-charcoal-500 dark:text-cream-200"
           >
             {label}
           </label>
@@ -59,15 +60,15 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           id={selectId}
           className={`
-            block w-full appearance-none rounded-lg border bg-white px-4 py-2.5
-            text-gray-900
-            transition-colors duration-200
-            focus:outline-none focus:ring-2
-            disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50
-            dark:bg-gray-800 dark:text-white
+            block w-full appearance-none rounded-lg border bg-white px-4 py-3
+            text-charcoal-500
+            transition-all duration-200
+            focus:outline-none
+            disabled:cursor-not-allowed disabled:bg-cream-100 disabled:opacity-50
+            dark:bg-[#1a1814] dark:text-cream-100
             ${hasError
-              ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600'
+              ? 'border-[#c75f5f] focus:border-[#c75f5f] focus:ring-2 focus:ring-[#c75f5f]/20'
+              : 'border-cream-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 dark:border-charcoal-500'
             }
             ${className}
           `}
@@ -91,7 +92,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {error && (
           <p
             id={`${selectId}-error`}
-            className="mt-1.5 text-sm text-red-600 dark:text-red-400"
+            className="mt-2 text-sm text-[#c75f5f]"
             role="alert"
           >
             {error}
@@ -100,7 +101,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
 
         {/* 도움말 텍스트 */}
         {helperText && !error && (
-          <p className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-sm text-stone-500">
             {helperText}
           </p>
         )}
