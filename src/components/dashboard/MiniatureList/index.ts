@@ -1,0 +1,1 @@
+export { MiniatureList } from './MiniatureList'

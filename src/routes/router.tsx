@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router'
 import { MainLayout } from '@/components/layout'
-import { HomePage, NotFoundPage, LoginPage, RegisterPage } from '@/pages'
+import { HomePage, NotFoundPage, LoginPage, RegisterPage, DashboardPage } from '@/pages'
 import { ProtectedRoute } from './ProtectedRoute'
 import { GuestRoute } from './GuestRoute'
 
@@ -40,7 +40,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: 'dashboard',
-            element: <div className="p-8 text-center text-gray-500">대시보드 페이지 (Phase 4에서 구현 예정)</div>,
+            element: <DashboardPage />,
           },
         ],
       },

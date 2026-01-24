@@ -1,0 +1,1 @@
+export { AddMiniatureModal } from './AddMiniatureModal'
