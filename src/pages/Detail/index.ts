@@ -1,0 +1,1 @@
+export { MiniatureDetailPage } from './MiniatureDetailPage'

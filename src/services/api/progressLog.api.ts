@@ -13,24 +13,26 @@ import type {
 export const progressLogApi = {
   /**
    * 미니어처의 진행 로그 목록 조회
+   * GET /progress-logs?miniatureId={id}&page=0&size=10
    */
   getByMiniature: async (
     miniatureId: number,
     params?: PaginationParams
   ): Promise<PageResponse<ProgressLogResponse>> => {
     const response = await apiClient.get<PageResponse<ProgressLogResponse>>(
-      `/miniatures/${miniatureId}/progress-logs`,
-      { params }
+      '/progress-logs',
+      { params: { miniatureId, ...params } }
     )
     return response.data
   },
 
   /**
    * 공개 진행 로그 피드 조회
+   * GET /public/progress-logs
    */
   getPublic: async (params?: PaginationParams): Promise<PageResponse<ProgressLogResponse>> => {
     const response = await apiClient.get<PageResponse<ProgressLogResponse>>(
-      '/progress-logs/public',
+      '/public/progress-logs',
       { params }
     )
     return response.data
@@ -38,15 +40,10 @@ export const progressLogApi = {
 
   /**
    * 진행 로그 생성
+   * POST /progress-logs
    */
-  create: async (
-    miniatureId: number,
-    data: ProgressLogCreateRequest
-  ): Promise<ProgressLogResponse> => {
-    const response = await apiClient.post<ProgressLogResponse>(
-      `/miniatures/${miniatureId}/progress-logs`,
-      data
-    )
+  create: async (data: ProgressLogCreateRequest): Promise<ProgressLogResponse> => {
+    const response = await apiClient.post<ProgressLogResponse>('/progress-logs', data)
     return response.data
   },
 
