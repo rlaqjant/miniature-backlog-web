@@ -18,6 +18,8 @@
 |-----------|------|---------------|-------|
 | `POST /auth/register` | 회원가입 | ✅ 완료 | Phase 2 |
 | `POST /auth/login` | 로그인 | ✅ 완료 | Phase 2 |
+| `POST /auth/logout` | 로그아웃 | ✅ 완료 | Phase 2 |
+| `POST /auth/refresh` | 토큰 갱신 | ✅ 완료 | Phase 2 |
 | `GET /miniatures` | 백로그 목록 조회 | ✅ 완료 | Phase 4 |
 | `POST /miniatures` | 백로그 생성 | ✅ 완료 | Phase 4 |
 | `GET /miniatures/{id}` | 백로그 상세 조회 | ✅ 완료 | Phase 5 |
@@ -103,11 +105,11 @@ src/
 ### 완료된 항목
 - [x] 로그인 페이지 UI 구현
 - [x] 회원가입 페이지 UI 구현
-- [x] JWT 토큰 저장 및 관리 로직
+- [x] JWT 토큰 관리 (httpOnly 쿠키 방식)
 - [x] 인증 상태 전역 관리
 - [x] Protected Route 통합
 - [x] GuestRoute 구현 (로그인 사용자 리다이렉트)
-- [x] 로그아웃 기능
+- [x] 로그아웃 기능 (서버 API 연동)
 - [x] 자동 토큰 갱신 로직 (401 시 토큰 갱신 후 재요청)
 - [x] 인증 에러 처리 (401 리다이렉트)
 - [x] useAuth 커스텀 훅 구현
@@ -135,9 +137,11 @@ src/
 - 로그인/회원가입 폼 유효성 검사
 - 비밀번호 확인 일치 여부 검증
 - 로그인 후 원래 페이지로 리다이렉트
-- 자동 토큰 갱신 (대기열 패턴 적용)
-- user 정보 localStorage 영속화
-- AuthInitializer를 통한 앱 시작 시 토큰 검증
+- JWT 토큰 httpOnly 쿠키 방식 (XSS 방어, localStorage 미사용)
+- 자동 토큰 갱신 (대기열 패턴 적용, withCredentials: true)
+- user 정보만 localStorage 영속화 (토큰은 쿠키로 관리)
+- AuthInitializer를 통한 앱 시작 시 쿠키 유효성 검증
+- 로그아웃 시 서버 API 호출로 쿠키 삭제
 
 ---
 
@@ -397,6 +401,7 @@ src/
 | 2026-01-23 | Phase 4 완료 - 대시보드, 백로그 목록/추가, 필터/정렬, 상태 UI |
 | 2026-01-24 | API 명세 기반 타입/서비스 레이어 전면 수정 - ApiResponse 구조, ID 타입, 상태값 변경, 신규 API 서비스(backlogItem, progressLog, image) 추가, AuthInitializer 컴포넌트 추가 |
 | 2026-01-24 | Phase 5 완료 - 백로그 상세 페이지, 단계 상태 관리, 진행 로그 목록, 수정/삭제 기능, progressLog API 엔드포인트 수정 |
+| 2026-01-25 | JWT 토큰 저장 방식 변경 - localStorage에서 httpOnly 쿠키로 전환, logout API 연동, 보안 강화 |
 
 ---
 
