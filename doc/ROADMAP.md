@@ -24,15 +24,15 @@
 | `POST /miniatures` | 백로그 생성 | ✅ 완료 | Phase 4 |
 | `GET /miniatures/{id}` | 백로그 상세 조회 | ✅ 완료 | Phase 5 |
 | `PATCH /backlog-items/{id}` | 단계 상태 변경 | ✅ 완료 | Phase 5 |
-| `POST /progress-logs` | 진행 로그 작성 | 대기 중 | Phase 6 |
+| `POST /progress-logs` | 진행 로그 작성 | ✅ 완료 | Phase 6 |
 | `GET /progress-logs` | 내 진행 로그 목록 | ✅ 완료 | Phase 5 |
 | `GET /public/progress-logs` | 공개 게시판 조회 | 대기 중 | Phase 7 |
-| `POST /images/presign` | presigned URL 발급 | 대기 중 | Phase 6 |
-| `POST /images` | 이미지 메타데이터 저장 | 대기 중 | Phase 6 |
+| `POST /images/presign` | presigned URL 발급 | ✅ 완료 | Phase 6 |
+| `POST /images` | 이미지 메타데이터 저장 | ✅ 완료 | Phase 6 |
 
 ---
 
-## 현재 진행률: 60%
+## 현재 진행률: 70%
 
 ---
 
@@ -278,7 +278,7 @@ src/
 
 ---
 
-## Phase 6: 진행 로그 및 이미지 업로드 (Progress Log)
+## Phase 6: 진행 로그 및 이미지 업로드 (Progress Log) ✅ 완료
 
 ### 사용 API
 - `POST /progress-logs` - 진행 로그 작성
@@ -287,22 +287,55 @@ src/
 
 ### API 연동 작업
 - [x] `imageApi.ts` 신규 생성
-- [ ] R2 직접 업로드 로직 구현
+- [x] R2 직접 업로드 로직 구현
+- [x] 타입 수정 (API 스펙 일치: fileName, uploadUrl, progressLogId)
 
 ### 완료된 항목
-(없음)
+- [x] 진행 로그 작성 폼 (POST /progress-logs)
+- [x] 이미지 업로드 UI (ImageUploader)
+  - [x] Presigned URL 요청 (POST /images/presign)
+  - [x] R2 직접 업로드 로직 (uploadWithProgress)
+  - [x] 메타데이터 저장 (POST /images)
+- [x] 이미지 미리보기 (로컬 URL)
+- [x] 다중 이미지 업로드 (최대 5장)
+- [x] 드래그 앤 드롭 지원
+- [x] 업로드 진행 상태 표시
+- [x] 로그 공개/비공개 설정
+- [x] 진행 로그 삭제
+
+### Phase 6 구현 내용 요약
+
+#### 생성/수정된 파일
+```
+src/
+├── types/
+│   └── image.types.ts          # API 스펙 일치 타입 수정
+├── services/api/
+│   └── image.api.ts            # uploadWithProgress 메서드 추가
+├── components/
+│   ├── common/
+│   │   └── ImageUploader/      # 이미지 업로드 컴포넌트 (드래그앤드롭, 미리보기)
+│   └── detail/
+│       ├── AddProgressLogModal.tsx  # 진행 로그 작성 모달
+│       └── ProgressLogList.tsx      # 추가/삭제 버튼 추가
+├── hooks/
+│   └── useMiniatureDetail.ts   # createProgressLog, deleteProgressLog 메서드 추가
+└── pages/
+    └── Detail/
+        └── MiniatureDetailPage.tsx  # 모달 상태 관리 통합
+```
+
+#### 주요 기능
+- 진행 로그 생성 시 이미지 첨부 (선택)
+- Presigned URL 기반 R2 직접 업로드 (백엔드 경유 없음)
+- 업로드 진행률 실시간 표시
+- 개별 이미지 업로드 실패 시 건너뛰기 (부분 성공 허용)
+- 이미지 드래그 앤 드롭 + 클릭 선택
+- 로컬 미리보기 (URL.createObjectURL)
+- 본인 로그만 삭제 가능 (userId 확인)
 
 ### 진행 예정 항목
-- [ ] 진행 로그 작성 폼 (POST /progress-logs)
-- [ ] 이미지 업로드 UI
-  - [ ] Presigned URL 요청 (POST /images/presign)
-  - [ ] R2 직접 업로드 로직
-  - [ ] 메타데이터 저장 (POST /images)
-- [ ] 이미지 미리보기
-- [ ] 다중 이미지 업로드
-- [ ] 업로드 진행 상태 표시
-- [ ] 로그 공개/비공개 설정
-- [ ] 진행 로그 수정/삭제
+- [ ] 진행 로그 수정 기능
 
 ---
 
@@ -402,6 +435,8 @@ src/
 | 2026-01-24 | API 명세 기반 타입/서비스 레이어 전면 수정 - ApiResponse 구조, ID 타입, 상태값 변경, 신규 API 서비스(backlogItem, progressLog, image) 추가, AuthInitializer 컴포넌트 추가 |
 | 2026-01-24 | Phase 5 완료 - 백로그 상세 페이지, 단계 상태 관리, 진행 로그 목록, 수정/삭제 기능, progressLog API 엔드포인트 수정 |
 | 2026-01-25 | JWT 토큰 저장 방식 변경 - localStorage에서 httpOnly 쿠키로 전환, logout API 연동, 보안 강화 |
+| 2026-01-25 | Phase 6 완료 - 진행 로그 작성, 이미지 업로드 (Presigned URL + R2 직접 업로드), 드래그앤드롭, 로그 삭제 기능 |
+| 2026-01-25 | 이미지 URL 처리 개선 - 백엔드 응답의 imageUrl 필드 직접 사용, getImageUrl 헬퍼 삭제 |
 
 ---
 
