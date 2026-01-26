@@ -69,7 +69,7 @@ export function HomePage() {
                     <Link to="/board">
                       <Button
                         size="lg"
-                        variant="ghost"
+                        variant="primary"
                         className="text-cream-100 border-cream-100/30 hover:bg-cream-50/10"
                       >
                         둘러보기

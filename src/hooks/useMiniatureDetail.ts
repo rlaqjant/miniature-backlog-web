@@ -1,12 +1,22 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router'
-import { miniatureApi, backlogItemApi, progressLogApi } from '@/services/api'
+import { miniatureApi, backlogItemApi, progressLogApi, imageApi } from '@/services/api'
 import type {
   MiniatureDetail,
   BacklogItemStatus,
   UpdateMiniatureRequest,
   ProgressLogResponse,
 } from '@/types'
+
+/**
+ * 업로드 진행 상태
+ */
+interface UploadProgress {
+  step: 'creating' | 'uploading'
+  current: number
+  total: number
+  imagePercent?: number
+}
 
 interface UseMiniatureDetail {
   /** 미니어처 상세 정보 */
@@ -29,6 +39,16 @@ interface UseMiniatureDetail {
   isUpdating: boolean
   /** 삭제 중 */
   isDeleting: boolean
+  /** 진행 로그 생성 */
+  createProgressLog: (content: string, isPublic: boolean, files?: File[]) => Promise<void>
+  /** 진행 로그 삭제 */
+  deleteProgressLog: (logId: number) => Promise<void>
+  /** 진행 로그 생성 중 */
+  isCreatingLog: boolean
+  /** 진행 로그 삭제 중 */
+  isDeletingLog: boolean
+  /** 업로드 진행 상태 */
+  uploadProgress: UploadProgress | null
 }
 
 /**
@@ -42,6 +62,9 @@ export function useMiniatureDetail(id: number): UseMiniatureDetail {
   const [error, setError] = useState<string | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isCreatingLog, setIsCreatingLog] = useState(false)
+  const [isDeletingLog, setIsDeletingLog] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null)
 
   // 상세 정보 조회
   const fetchDetail = useCallback(async () => {
@@ -143,6 +166,98 @@ export function useMiniatureDetail(id: number): UseMiniatureDetail {
     }
   }, [id, navigate])
 
+  // 진행 로그 생성 (이미지 포함)
+  const createProgressLog = useCallback(
+    async (content: string, isPublic: boolean, files?: File[]) => {
+      setIsCreatingLog(true)
+      setUploadProgress({
+        step: 'creating',
+        current: 0,
+        total: files?.length || 0,
+      })
+      setError(null)
+
+      try {
+        // Step 1: 진행 로그 생성
+        const log = await progressLogApi.create({
+          miniatureId: id,
+          content,
+          isPublic,
+        })
+
+        // Step 2-4: 이미지 업로드 (있는 경우)
+        if (files && files.length > 0) {
+          const uploadErrors: string[] = []
+
+          for (let i = 0; i < files.length; i++) {
+            setUploadProgress({
+              step: 'uploading',
+              current: i + 1,
+              total: files.length,
+              imagePercent: 0,
+            })
+
+            try {
+              await imageApi.uploadWithProgress(files[i], log.id, (percent) => {
+                setUploadProgress((prev) =>
+                  prev ? { ...prev, imagePercent: percent } : null
+                )
+              })
+            } catch (err) {
+              const errorMsg =
+                err instanceof Error ? err.message : `이미지 ${i + 1} 업로드 실패`
+              uploadErrors.push(errorMsg)
+              console.error(`이미지 ${i + 1} 업로드 실패:`, err)
+              // 개별 이미지 실패는 계속 진행
+            }
+          }
+
+          // 이미지 업로드 실패 시 에러 전파 (모달이 닫히지 않도록)
+          if (uploadErrors.length > 0) {
+            throw new Error(uploadErrors[0])
+          }
+        }
+
+        // 목록 새로고침
+        const logsData = await progressLogApi.getByMiniature(id, { page: 0, size: 10 })
+        setProgressLogs(logsData.content)
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : '진행 로그 작성에 실패했습니다'
+        setError(message)
+        throw err
+      } finally {
+        setIsCreatingLog(false)
+        setUploadProgress(null)
+      }
+    },
+    [id]
+  )
+
+  // 진행 로그 삭제
+  const deleteProgressLog = useCallback(
+    async (logId: number) => {
+      setIsDeletingLog(true)
+      setError(null)
+
+      try {
+        await progressLogApi.delete(logId)
+
+        // 목록 새로고침
+        const logsData = await progressLogApi.getByMiniature(id, { page: 0, size: 10 })
+        setProgressLogs(logsData.content)
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : '진행 로그 삭제에 실패했습니다'
+        setError(message)
+        throw err
+      } finally {
+        setIsDeletingLog(false)
+      }
+    },
+    [id]
+  )
+
   return {
     miniature,
     progressLogs,
@@ -154,5 +269,10 @@ export function useMiniatureDetail(id: number): UseMiniatureDetail {
     deleteMiniature,
     isUpdating,
     isDeleting,
+    createProgressLog,
+    deleteProgressLog,
+    isCreatingLog,
+    isDeletingLog,
+    uploadProgress,
   }
 }

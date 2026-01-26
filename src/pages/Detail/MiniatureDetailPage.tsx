@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { Spinner } from '@/components/common'
 import {
@@ -7,6 +7,7 @@ import {
   ProgressLogList,
   EditMiniatureModal,
   DeleteConfirmModal,
+  AddProgressLogModal,
 } from '@/components/detail'
 import { useMiniatureDetail } from '@/hooks/useMiniatureDetail'
 
@@ -20,6 +21,8 @@ export function MiniatureDetailPage() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isAddLogModalOpen, setIsAddLogModalOpen] = useState(false)
+  const [logToDelete, setLogToDelete] = useState<number | null>(null)
 
   const {
     miniature,
@@ -31,7 +34,28 @@ export function MiniatureDetailPage() {
     deleteMiniature,
     isUpdating,
     isDeleting,
+    createProgressLog,
+    deleteProgressLog,
+    isCreatingLog,
+    isDeletingLog,
+    uploadProgress,
   } = useMiniatureDetail(miniatureId)
+
+  // 진행 로그 삭제 요청
+  const handleDeleteLogRequest = useCallback((logId: number) => {
+    setLogToDelete(logId)
+  }, [])
+
+  // 진행 로그 삭제 확인
+  const handleDeleteLogConfirm = useCallback(async () => {
+    if (logToDelete) {
+      try {
+        await deleteProgressLog(logToDelete)
+      } finally {
+        setLogToDelete(null)
+      }
+    }
+  }, [logToDelete, deleteProgressLog])
 
   // 잘못된 ID
   if (isNaN(miniatureId)) {
@@ -109,7 +133,12 @@ export function MiniatureDetailPage() {
         />
 
         {/* 진행 로그 */}
-        <ProgressLogList logs={progressLogs} />
+        <ProgressLogList
+          logs={progressLogs}
+          onAddLog={() => setIsAddLogModalOpen(true)}
+          onDeleteLog={handleDeleteLogRequest}
+          isDeletingLog={isDeletingLog}
+        />
       </div>
 
       {/* 수정 모달 */}
@@ -128,6 +157,24 @@ export function MiniatureDetailPage() {
         itemName={miniature.title}
         onConfirm={deleteMiniature}
         isDeleting={isDeleting}
+      />
+
+      {/* 진행 로그 추가 모달 */}
+      <AddProgressLogModal
+        isOpen={isAddLogModalOpen}
+        onClose={() => setIsAddLogModalOpen(false)}
+        onSave={createProgressLog}
+        isSaving={isCreatingLog}
+        uploadProgress={uploadProgress}
+      />
+
+      {/* 진행 로그 삭제 확인 모달 */}
+      <DeleteConfirmModal
+        isOpen={logToDelete !== null}
+        onClose={() => setLogToDelete(null)}
+        itemName="이 진행 기록"
+        onConfirm={handleDeleteLogConfirm}
+        isDeleting={isDeletingLog}
       />
     </div>
   )
