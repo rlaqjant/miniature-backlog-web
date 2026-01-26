@@ -1,4 +1,4 @@
-# SinTower API 명세서 (프론트엔드 개발용)
+# PaintLater API 명세서 (프론트엔드 개발용)
 
 > 최종 수정일: 2026-01-24
 
@@ -16,7 +16,7 @@
 
 | 항목 | 값 |
 |------|-----|
-| Base URL | `https://api.sintower.com` (운영) / `http://localhost:8080` (개발) |
+| Base URL | `https://api.paintlater.org` (운영) / `http://localhost:8080` (개발) |
 | Content-Type | `application/json` |
 | 인증 방식 | HttpOnly 쿠키 (JWT) |
 | 쿠키 이름 | `access_token` |

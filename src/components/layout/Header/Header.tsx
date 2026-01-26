@@ -30,7 +30,7 @@ export function Header() {
             className="flex items-center gap-2"
           >
             <span className="font-display text-2xl font-bold text-forest-600 dark:text-forest-400">
-              SinTower
+              PaintLater
             </span>
           </Link>
         </div>

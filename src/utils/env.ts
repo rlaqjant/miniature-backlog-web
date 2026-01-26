@@ -7,7 +7,7 @@ export const env = {
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
 
   /** 앱 이름 */
-  appName: import.meta.env.VITE_APP_NAME || 'SinTower',
+  appName: import.meta.env.VITE_APP_NAME || 'PaintLater',
 
   /** 앱 버전 */
   appVersion: import.meta.env.VITE_APP_VERSION || '0.0.0',

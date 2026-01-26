@@ -54,7 +54,7 @@ export function LoginPage() {
             로그인
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            SinTower에 오신 것을 환영합니다
+            PaintLater에 오신 것을 환영합니다
           </p>
         </div>
 

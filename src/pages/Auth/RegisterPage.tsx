@@ -77,7 +77,7 @@ export function RegisterPage() {
             회원가입
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            SinTower와 함께 미니어처 도색을 기록하세요
+            PaintLater와 함께 미니어처 도색을 기록하세요
           </p>
         </div>
 

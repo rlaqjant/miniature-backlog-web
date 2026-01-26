@@ -3,7 +3,7 @@
 ## Frontend PRD
 미니어처 백로그 추적 서비스
 
-가제 : SinTower - 죄악의 탑
+가제 : PaintLater
 
 ### 기술 스택
 Vite/React/TypeScript
@@ -107,7 +107,7 @@ NEXT_PUBLIC_API_BASE_URL=https://api.example.com
 ## Backend PRD
 미니어처 백로그 추적 서비스
 
-가제 : SinTower - 죄악의 탑
+가제 : PaintLater
 
 ### 기술스택
 Spring/PostgreSQL
@@ -197,7 +197,7 @@ Authorization: Bearer <JWT>
 ## API Specification
 미니어처 백로그 추적 서비스
 
-가제 : SinTower - 죄악의 탑
+가제 : PaintLater
 
 Base URL: `https://api.example.com`
 

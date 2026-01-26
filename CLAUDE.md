@@ -18,7 +18,7 @@ npm run preview  # 빌드 결과 미리보기
 
 ## 아키텍처
 
-**SinTower** - 미니어처 도색 백로그 추적 서비스 프론트엔드
+**PaintLater** - 미니어처 도색 백로그 추적 서비스 프론트엔드
 
 ### 기술 스택
 - React 19 + Vite 7 + TypeScript

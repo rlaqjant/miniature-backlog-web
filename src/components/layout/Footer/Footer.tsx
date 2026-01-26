@@ -13,7 +13,7 @@ export function Footer() {
           {/* 로고 & 설명 */}
           <div className="text-center md:text-left">
             <h3 className="font-display text-xl font-bold text-cream-50 mb-2">
-              SinTower
+            PaintLater
             </h3>
             <p className="text-sm text-forest-200">
               미니어처 도색 백로그 추적 서비스
@@ -46,7 +46,7 @@ export function Footer() {
         {/* 하단 영역 - 저작권 */}
         <div className="border-t border-forest-500 pt-6">
           <p className="text-center text-xs text-forest-300">
-            &copy; {currentYear} SinTower - 죄악의 탑. All rights reserved.
+            &copy; {currentYear} PaintLater. All rights reserved.
           </p>
         </div>
       </div>
