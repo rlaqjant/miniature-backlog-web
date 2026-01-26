@@ -387,9 +387,12 @@ src/
 
 ### 완료된 항목
 - [x] Cloudflare Pages SPA 라우팅 설정 (_redirects)
+- [x] Cloudflare Pages Functions API 프록시 설정
+  - iOS Safari 크로스 사이트 쿠키 차단 문제 해결
+  - `/api/*` 요청을 백엔드(Render)로 프록시
+  - 환경 변수로 백엔드 URL 관리 (BACKEND_URL)
 
 ### 진행 예정 항목
-- [ ] Cloudflare Pages 배포 설정
 - [ ] CI/CD 파이프라인 구축
 - [ ] 환경별 설정 분리 (dev/staging/prod)
 - [ ] 에러 모니터링 연동
@@ -437,6 +440,7 @@ src/
 | 2026-01-25 | JWT 토큰 저장 방식 변경 - localStorage에서 httpOnly 쿠키로 전환, logout API 연동, 보안 강화 |
 | 2026-01-25 | Phase 6 완료 - 진행 로그 작성, 이미지 업로드 (Presigned URL + R2 직접 업로드), 드래그앤드롭, 로그 삭제 기능 |
 | 2026-01-25 | 이미지 URL 처리 개선 - 백엔드 응답의 imageUrl 필드 직접 사용, getImageUrl 헬퍼 삭제 |
+| 2026-01-26 | Cloudflare Pages Functions API 프록시 추가 - iOS Safari 크로스 사이트 쿠키 문제 해결 |
 
 ---
 
