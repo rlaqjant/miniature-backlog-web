@@ -17,30 +17,57 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   const targetPath = url.pathname.replace(/^\/api/, '')
   const targetUrl = `${backendUrl}${targetPath}${url.search}`
 
-  // 요청 헤더 복사 (Host 제외)
-  const headers = new Headers(context.request.headers)
-  headers.delete('host')
+  // 요청 헤더 복사 (Host, CF 관련 헤더 제외)
+  const headers = new Headers()
+  for (const [key, value] of context.request.headers.entries()) {
+    if (
+      !key.toLowerCase().startsWith('cf-') &&
+      key.toLowerCase() !== 'host' &&
+      key.toLowerCase() !== 'x-forwarded-proto'
+    ) {
+      headers.set(key, value)
+    }
+  }
 
   try {
+    // body 처리: GET/HEAD가 아닌 경우 body 읽어서 전달
+    let body: string | null = null
+    if (context.request.method !== 'GET' && context.request.method !== 'HEAD') {
+      body = await context.request.text()
+    }
+
     const response = await fetch(targetUrl, {
       method: context.request.method,
       headers,
-      body: context.request.method !== 'GET' && context.request.method !== 'HEAD'
-        ? context.request.body
-        : undefined,
+      body,
     })
 
     // 응답 헤더 복사
-    const responseHeaders = new Headers(response.headers)
+    const responseHeaders = new Headers()
+    for (const [key, value] of response.headers.entries()) {
+      responseHeaders.set(key, value)
+    }
 
-    return new Response(response.body, {
+    // 응답 body 읽기
+    const responseBody = await response.text()
+
+    return new Response(responseBody, {
       status: response.status,
       headers: responseHeaders,
     })
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Proxy error' }), {
-      status: 502,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    // 디버깅용 상세 에러
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return new Response(
+      JSON.stringify({
+        error: 'Proxy error',
+        message: errorMessage,
+        targetUrl,
+      }),
+      {
+        status: 502,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   }
 }
