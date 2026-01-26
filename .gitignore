@@ -17,9 +17,9 @@ dist-ssr/
 *.sln
 *.sw?
 
-# 환경 변수 (로컬)
-.env.local
-.env.*.local
+# 환경 변수
+.env
+.env.*
 
 # 로그
 logs
@@ -35,3 +35,5 @@ coverage/
 
 # 타입스크립트 캐시
 *.tsbuildinfo
+
+.history/
