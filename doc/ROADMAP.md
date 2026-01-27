@@ -8,7 +8,7 @@
 ### 핵심 기능
 - 개인 백로그 관리 (미니어처 등록, 진행 상태 추적)
 - 진행 로그 작성 및 이미지 업로드
-- 공개 게시판을 통한 진행 공유
+- 로그인 사용자 전용 게시판을 통한 진행 공유
 
 ---
 
@@ -26,13 +26,13 @@
 | `PATCH /backlog-items/{id}` | 단계 상태 변경 | ✅ 완료 | Phase 5 |
 | `POST /progress-logs` | 진행 로그 작성 | ✅ 완료 | Phase 6 |
 | `GET /progress-logs` | 내 진행 로그 목록 | ✅ 완료 | Phase 5 |
-| `GET /public/progress-logs` | 공개 게시판 조회 | 대기 중 | Phase 7 |
+| `GET /public/progress-logs` | 게시판 조회 (인증 필요) | ✅ 완료 | Phase 7 |
 | `POST /images/presign` | presigned URL 발급 | ✅ 완료 | Phase 6 |
 | `POST /images` | 이미지 메타데이터 저장 | ✅ 완료 | Phase 6 |
 
 ---
 
-## 현재 진행률: 70%
+## 현재 진행률: 82%
 
 ---
 
@@ -339,29 +339,88 @@ src/
 
 ---
 
-## Phase 7: 공개 게시판 (Public Board)
+## Phase 7: 게시판 (Board) ✅ 완료
 
 ### 사용 API
-- `GET /public/progress-logs?page=0&size=20` - 공개 게시판 (페이지네이션)
+- `GET /public/progress-logs?page=0&size=12` - 게시판 조회 (페이지네이션, 인증 필요)
 
 ### API 연동 작업
-- [ ] `progressLogApi.getPublicLogs(page, size)` 구현
+- [x] `progressLogApi.getPublic(params)` 구현
 
 ### 완료된 항목
-(없음)
+- [x] 게시판 페이지 레이아웃 (/board)
+- [x] 공개 진행 로그 목록 조회 (GET /public/progress-logs)
+- [x] 게시글 카드 컴포넌트 (PublicLogCard)
+  - [x] 썸네일 이미지 (4:3 비율, lazy loading)
+  - [x] 작성자 닉네임
+  - [x] 상대 시간 표시 (date-fns)
+  - [x] 미니어처 제목
+  - [x] 내용 미리보기 (2줄 말줄임)
+  - [x] 이미지 개수 배지
+  - [x] 이미지 onError 핸들러 (ORB 차단 대응)
+- [x] 페이지네이션 (Pagination 공통 컴포넌트)
+  - [x] 이전/다음 버튼
+  - [x] 페이지 번호 표시 (최대 5개)
+  - [x] 말줄임(...) 처리
+  - [x] 접근성 aria 속성
+- [x] 게시글 상세 모달 (PublicLogDetailModal)
+  - [x] 작성자 정보 (닉네임 + 상대 시간)
+  - [x] 진행 로그 내용
+  - [x] 첨부 이미지 갤러리 (그리드 레이아웃)
+  - [x] 이미지 라이트박스 (yet-another-react-lightbox)
+- [x] usePublicBoard 커스텀 훅 (페이지네이션/로딩/에러 상태 관리)
+- [x] 로딩/에러/빈 상태 UI
+- [x] 반응형 카드 그리드 (1열 -> 2열 -> 3열)
+- [x] 게시판 접근 제어 변경: 로그인 사용자 전용으로 전환
+  - [x] 프론트엔드: /board 라우트를 ProtectedRoute 하위로 이동
+  - [x] 프론트엔드: 헤더의 게시판 링크를 isAuthenticated 조건으로 감싸기
+  - [x] 백엔드: SecurityConfig에서 /public/** permitAll 제거
+  - [x] 백엔드: PublicProgressLogController 주석 업데이트
+
+### Phase 7 구현 내용 요약
+
+#### 생성/수정된 파일
+```
+src/
+├── components/
+│   ├── board/
+│   │   ├── PublicLogCard.tsx         # 게시판 로그 카드 (썸네일, 작성자, 시간)
+│   │   └── PublicLogDetailModal.tsx  # 상세 모달 (라이트박스 포함)
+│   └── common/
+│       └── Pagination/
+│           ├── Pagination.tsx        # 공통 페이지네이션 컴포넌트
+│           └── index.ts
+├── hooks/
+│   └── usePublicBoard.ts            # 게시판 데이터 훅
+├── pages/
+│   └── Board/
+│       ├── PublicBoardPage.tsx       # 게시판 페이지
+│       └── index.ts
+└── routes/
+    └── router.tsx                   # /board 라우트 (ProtectedRoute 하위)
+
+package.json                          # date-fns, yet-another-react-lightbox 의존성 추가
+```
+
+#### 주요 기능
+- 로그인 사용자만 접근 가능한 보호된 라우트 (/board)
+- 비로그인 사용자는 헤더에서 게시판 링크가 숨겨짐
+- usePublicBoard 훅으로 API 호출/페이지네이션 상태 관리 분리
+- 카드 클릭 시 상세 모달 표시 (별도 페이지 이동 없이)
+- 이미지 클릭 시 라이트박스로 전체 크기 표시
+- 이미지 로드 실패 시 깨진 이미지 대신 숨김 처리 (OpaqueResponseBlocking 대응)
+- date-fns 한국어 로케일 기반 상대 시간 표시 ("3분 전", "2시간 전" 등)
+
+#### 라우트 변경
+- `/board` - 게시판 (인증 필요, ProtectedRoute 하위)
+
+#### 접근 정책 변경 (2026-01-27)
+- 변경 전: 비로그인 사용자도 접근 가능한 공개 라우트
+- 변경 후: 로그인 사용자만 접근 가능한 보호된 라우트
+- 변경 사유: 서비스 초기 단계에서 인증된 사용자 중심의 커뮤니티 운영
+- 백엔드: SecurityConfig에서 /public/** 엔드포인트의 permitAll 제거
 
 ### 진행 예정 항목
-- [ ] 공개 게시판 페이지 레이아웃
-- [ ] 공개 진행 로그 목록 조회 (GET /public/progress-logs)
-- [ ] 게시글 카드 컴포넌트
-  - [ ] 썸네일 이미지
-  - [ ] 작성자 닉네임
-  - [ ] 작성일
-- [ ] 무한 스크롤 또는 페이지네이션
-- [ ] 게시글 상세 페이지
-  - [ ] 작성자 정보
-  - [ ] 진행 로그 내용
-  - [ ] 첨부 이미지 갤러리
 - [ ] SEO 최적화 (메타 태그)
 
 ---
@@ -387,10 +446,8 @@ src/
 
 ### 완료된 항목
 - [x] Cloudflare Pages SPA 라우팅 설정 (_redirects)
-- [x] Cloudflare Pages Functions API 프록시 설정
-  - iOS Safari 크로스 사이트 쿠키 차단 문제 해결
-  - `/api/*` 요청을 백엔드(Render)로 프록시
-  - 환경 변수로 백엔드 URL 관리 (BACKEND_URL)
+- [x] 정식 도메인 기반 API 통신 설정
+  - API 프록시 제거, 직접 도메인 사용으로 전환
 
 ### 진행 예정 항목
 - [ ] CI/CD 파이프라인 구축
@@ -421,7 +478,7 @@ src/
 |---------|----------|------|
 | M1 - MVP 기반 | Phase 1~2 완료 (프로젝트 설정 + 인증) | ✅ 완료 |
 | M2 - 핵심 기능 | Phase 3~5 완료 (랜딩 + 대시보드 + 상세) | ✅ 완료 |
-| M3 - 완전 기능 | Phase 6~7 완료 (로그 + 공개 게시판) | 예정 |
+| M3 - 완전 기능 | Phase 6~7 완료 (로그 + 공개 게시판) | ✅ 완료 |
 | M4 - 정식 출시 | Phase 8~9 완료 (고도화 + 배포) | 예정 |
 
 ---
@@ -441,6 +498,10 @@ src/
 | 2026-01-25 | Phase 6 완료 - 진행 로그 작성, 이미지 업로드 (Presigned URL + R2 직접 업로드), 드래그앤드롭, 로그 삭제 기능 |
 | 2026-01-25 | 이미지 URL 처리 개선 - 백엔드 응답의 imageUrl 필드 직접 사용, getImageUrl 헬퍼 삭제 |
 | 2026-01-26 | Cloudflare Pages Functions API 프록시 추가 - iOS Safari 크로스 사이트 쿠키 문제 해결 |
+| 2026-01-26 | API 프록시 제거 - 정식 도메인 사용으로 전환 |
+| 2026-01-27 | Phase 7 완료 - 공개 게시판 페이지(/board), 카드 그리드, 상세 모달, 라이트박스, 페이지네이션 공통 컴포넌트, 이미지 ORB 차단 대응, date-fns/yet-another-react-lightbox 의존성 추가 |
+| 2026-01-27 | M3 마일스톤 완료 - 핵심 기능 전체 구현 (백로그 관리 + 진행 로그 + 이미지 업로드 + 공개 게시판) |
+| 2026-01-27 | 게시판 접근 정책 변경 - 공개 게시판을 로그인 사용자 전용으로 전환 (프론트엔드: /board를 ProtectedRoute 하위로 이동, 헤더 링크 인증 조건 추가 / 백엔드: SecurityConfig /public/** permitAll 제거) |
 
 ---
 

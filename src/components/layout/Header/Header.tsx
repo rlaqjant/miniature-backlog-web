@@ -37,20 +37,21 @@ export function Header() {
 
         {/* 네비게이션 */}
         <nav className="hidden lg:flex items-center gap-8">
-          <Link
-            to="/board"
-            className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
-          >
-            공개 게시판
-          </Link>
-
           {isAuthenticated && (
-            <Link
-              to="/dashboard"
-              className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
-            >
-              내 백로그
-            </Link>
+            <>
+              <Link
+                to="/board"
+                className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
+              >
+                공개 게시판
+              </Link>
+              <Link
+                to="/dashboard"
+                className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
+              >
+                내 백로그
+              </Link>
+            </>
           )}
         </nav>
 

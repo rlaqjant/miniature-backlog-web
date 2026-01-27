@@ -19,12 +19,6 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
 
-      // 공개 게시판 (인증 불필요)
-      {
-        path: 'board',
-        element: <PublicBoardPage />,
-      },
-
       // 비로그인 사용자 전용 라우트
       {
         element: <GuestRoute />,
@@ -51,6 +45,10 @@ export const router = createBrowserRouter([
           {
             path: 'miniatures/:id',
             element: <MiniatureDetailPage />,
+          },
+          {
+            path: 'board',
+            element: <PublicBoardPage />,
           },
         ],
       },
