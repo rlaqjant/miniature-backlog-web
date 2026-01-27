@@ -1,4 +1,5 @@
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
+import { useEffect } from 'react'
 import { useAuthStore } from '@/stores'
 import { useUIStore } from '@/stores'
 import { Button } from '@/components/common'
@@ -9,76 +10,132 @@ import { Button } from '@/components/common'
  */
 export function Header() {
   const { isAuthenticated, user, logout } = useAuthStore()
-  const { toggleSidebar } = useUIStore()
+  const { isSidebarOpen, toggleSidebar, setSidebarOpen } = useUIStore()
+  const location = useLocation()
+
+  // 페이지 이동 시 모바일 메뉴 닫기
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [location.pathname, setSidebarOpen])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-cream-200 bg-cream-50/95 backdrop-blur supports-[backdrop-filter]:bg-cream-50/80 dark:border-charcoal-500 dark:bg-[#1a1814]/95">
-      <div className="container mx-auto flex h-[72px] items-center justify-between px-6">
-        {/* 로고 */}
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            className="lg:hidden text-charcoal-500 hover:text-forest-500 transition-colors"
-            onClick={toggleSidebar}
-            aria-label="메뉴 열기"
-          >
-            <MenuIcon className="h-6 w-6" />
-          </button>
+    <>
+      <header className="sticky top-0 z-50 w-full border-b border-cream-200 bg-cream-50/95 backdrop-blur supports-[backdrop-filter]:bg-cream-50/80 dark:border-charcoal-500 dark:bg-[#1a1814]/95">
+        <div className="container mx-auto flex h-[72px] items-center justify-between px-6">
+          {/* 로고 */}
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              className="lg:hidden text-charcoal-500 hover:text-forest-500 transition-colors"
+              onClick={toggleSidebar}
+              aria-label={isSidebarOpen ? '메뉴 닫기' : '메뉴 열기'}
+            >
+              {isSidebarOpen ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+            </button>
 
-          <Link
-            to="/"
-            className="flex items-center gap-2"
-          >
-            <span className="font-display text-2xl font-bold text-forest-600 dark:text-forest-400">
-              PaintLater
-            </span>
-          </Link>
-        </div>
-
-        {/* 네비게이션 */}
-        <nav className="hidden lg:flex items-center gap-8">
-          {isAuthenticated && (
-            <>
-              <Link
-                to="/board"
-                className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
-              >
-                공개 게시판
-              </Link>
-              <Link
-                to="/dashboard"
-                className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
-              >
-                내 백로그
-              </Link>
-            </>
-          )}
-        </nav>
-
-        {/* 사용자 메뉴 */}
-        <div className="flex items-center gap-4">
-          {isAuthenticated ? (
-            <>
-              <span className="text-sm font-medium text-charcoal-500 dark:text-cream-200">
-                {user?.nickname}님
+            <Link
+              to="/"
+              className="flex items-center gap-2"
+            >
+              <span className="font-display text-2xl font-bold text-forest-600 dark:text-forest-400">
+                PaintLater
               </span>
-              <Button variant="outline" size="sm" onClick={logout}>
-                로그아웃
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link to="/login">
-                <Button variant="ghost" size="sm">로그인</Button>
-              </Link>
-              <Link to="/register">
-                <Button variant="primary" size="sm">회원가입</Button>
-              </Link>
-            </>
-          )}
+            </Link>
+          </div>
+
+          {/* 데스크톱 네비게이션 */}
+          <nav className="hidden lg:flex items-center gap-8">
+            {isAuthenticated && (
+              <>
+                <Link
+                  to="/board"
+                  className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
+                >
+                  공개 게시판
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
+                >
+                  내 백로그
+                </Link>
+              </>
+            )}
+          </nav>
+
+          {/* 사용자 메뉴 */}
+          <div className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <>
+                <span className="text-sm font-medium text-charcoal-500 dark:text-cream-200">
+                  {user?.nickname}님
+                </span>
+                <Button variant="outline" size="sm" onClick={logout}>
+                  로그아웃
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">로그인</Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="primary" size="sm">회원가입</Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* 모바일 메뉴 */}
+      {isSidebarOpen && (
+        <>
+          {/* 배경 오버레이 */}
+          <div
+            className="fixed inset-0 z-40 bg-charcoal-900/50 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+
+          {/* 메뉴 패널 */}
+          <nav className="fixed top-[72px] left-0 right-0 z-50 border-b border-cream-200 bg-cream-50 px-6 py-4 lg:hidden dark:border-charcoal-500 dark:bg-[#1a1814]">
+            <div className="flex flex-col gap-2">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/board"
+                    className="rounded-lg px-4 py-3 text-base font-medium text-charcoal-700 hover:bg-cream-200 transition-colors dark:text-cream-200 dark:hover:bg-charcoal-600"
+                  >
+                    공개 게시판
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="rounded-lg px-4 py-3 text-base font-medium text-charcoal-700 hover:bg-cream-200 transition-colors dark:text-cream-200 dark:hover:bg-charcoal-600"
+                  >
+                    내 백로그
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="rounded-lg px-4 py-3 text-base font-medium text-charcoal-700 hover:bg-cream-200 transition-colors dark:text-cream-200 dark:hover:bg-charcoal-600"
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="rounded-lg px-4 py-3 text-base font-medium text-forest-600 hover:bg-cream-200 transition-colors dark:text-forest-400 dark:hover:bg-charcoal-600"
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
+            </div>
+          </nav>
+        </>
+      )}
+    </>
   )
 }
 
@@ -96,6 +153,25 @@ function MenuIcon({ className }: { className?: string }) {
         strokeLinejoin="round"
         strokeWidth={2}
         d="M4 6h16M4 12h16M4 18h16"
+      />
+    </svg>
+  )
+}
+
+// 닫기 아이콘 컴포넌트
+function CloseIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M6 18L18 6M6 6l12 12"
       />
     </svg>
   )
