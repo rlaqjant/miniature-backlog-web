@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router'
 import { MainLayout } from '@/components/layout'
-import { HomePage, NotFoundPage, LoginPage, RegisterPage, DashboardPage, MiniatureDetailPage } from '@/pages'
+import { HomePage, NotFoundPage, LoginPage, RegisterPage, DashboardPage, MiniatureDetailPage, PublicBoardPage } from '@/pages'
 import { ProtectedRoute } from './ProtectedRoute'
 import { GuestRoute } from './GuestRoute'
 
@@ -17,6 +17,12 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+
+      // 공개 게시판 (인증 불필요)
+      {
+        path: 'board',
+        element: <PublicBoardPage />,
       },
 
       // 비로그인 사용자 전용 라우트

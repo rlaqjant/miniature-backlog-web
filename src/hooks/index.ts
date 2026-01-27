@@ -2,3 +2,4 @@
 export { useAuth } from './useAuth'
 export { useMiniatures } from './useMiniatures'
 export { useMiniatureDetail } from './useMiniatureDetail'
+export { usePublicBoard } from './usePublicBoard'

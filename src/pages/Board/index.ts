@@ -1,0 +1,1 @@
+export { PublicBoardPage } from './PublicBoardPage'
