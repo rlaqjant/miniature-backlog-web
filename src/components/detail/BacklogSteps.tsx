@@ -31,17 +31,6 @@ const statusStyles: Record<BacklogItemStatus, { bg: string; icon: string; text: 
 }
 
 /**
- * 단계 이름 한글 변환
- */
-const stepNameKorean: Record<string, string> = {
-  ASSEMBLY: '조립',
-  PRIMING: '서페이서',
-  SHADING: '쉐이딩',
-  HIGHLIGHTING: '하이라이트',
-  FINISHING: '마감',
-}
-
-/**
  * 상태 순환 순서
  */
 const statusOrder: BacklogItemStatus[] = ['TODO', 'IN_PROGRESS', 'DONE']
@@ -75,7 +64,7 @@ export function BacklogSteps({ items, onStatusChange, isUpdating }: BacklogSteps
       <div className="mt-5 space-y-3">
         {sortedItems.map((item, index) => {
           const style = statusStyles[item.status]
-          const stepName = stepNameKorean[item.stepName] || item.stepName
+          const stepName = item.stepName
 
           return (
             <button
