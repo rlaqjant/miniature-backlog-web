@@ -1,4 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
+import { processImage } from '@utils/imageProcess'
+import { ImageCropModal } from './ImageCropModal'
 
 interface ImageUploaderProps {
   /** 선택된 파일 목록 */
@@ -17,6 +19,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 /**
  * 이미지 업로드 컴포넌트
  * 드래그 앤 드롭, 클릭 선택, 미리보기 지원
+ * 자동 압축 + 개별 crop 편집 기능 포함
  */
 export function ImageUploader({
   files,
@@ -27,6 +30,12 @@ export function ImageUploader({
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [cropTarget, setCropTarget] = useState<{
+    index: number
+    src: string
+    fileName: string
+  } | null>(null)
 
   // 파일 검증
   const validateFile = useCallback((file: File): string | null => {
@@ -39,9 +48,9 @@ export function ImageUploader({
     return null
   }, [])
 
-  // 파일 추가
+  // 파일 추가 (자동 압축 포함)
   const handleFiles = useCallback(
-    (newFiles: FileList | File[]) => {
+    async (newFiles: FileList | File[]) => {
       setError(null)
       const fileArray = Array.from(newFiles)
 
@@ -52,7 +61,7 @@ export function ImageUploader({
         return
       }
 
-      const filesToAdd: File[] = []
+      const validFiles: File[] = []
       const errors: string[] = []
 
       for (const file of fileArray.slice(0, remainingSlots)) {
@@ -60,16 +69,28 @@ export function ImageUploader({
         if (validationError) {
           errors.push(validationError)
         } else {
-          filesToAdd.push(file)
+          validFiles.push(file)
         }
       }
 
       if (errors.length > 0) {
-        setError(errors[0]) // 첫 번째 에러만 표시
+        setError(errors[0])
       }
 
-      if (filesToAdd.length > 0) {
-        onChange([...files, ...filesToAdd])
+      if (validFiles.length > 0) {
+        // 자동 압축 처리
+        setIsProcessing(true)
+        try {
+          const processed = await Promise.all(
+            validFiles.map((file) => processImage(file))
+          )
+          onChange([...files, ...processed])
+        } catch {
+          // processImage 내부에서 이미 폴백 처리하므로 여기까지 올 가능성 낮음
+          onChange([...files, ...validFiles])
+        } finally {
+          setIsProcessing(false)
+        }
       }
     },
     [files, maxFiles, onChange, validateFile]
@@ -84,12 +105,37 @@ export function ImageUploader({
     [files, onChange]
   )
 
+  // 편집 모달 열기
+  const openCropModal = useCallback((index: number, file: File) => {
+    const src = URL.createObjectURL(file)
+    setCropTarget({ index, src, fileName: file.name })
+  }, [])
+
+  // crop 결과 적용
+  const handleCropComplete = useCallback(
+    (croppedFile: File) => {
+      if (cropTarget === null) return
+      const newFiles = [...files]
+      newFiles[cropTarget.index] = croppedFile
+      onChange(newFiles)
+    },
+    [cropTarget, files, onChange]
+  )
+
+  // crop 모달 닫기
+  const closeCropModal = useCallback(() => {
+    if (cropTarget) {
+      URL.revokeObjectURL(cropTarget.src)
+    }
+    setCropTarget(null)
+  }, [cropTarget])
+
   // 클릭으로 파일 선택
   const handleClick = useCallback(() => {
-    if (!disabled && inputRef.current) {
+    if (!disabled && !isProcessing && inputRef.current) {
       inputRef.current.click()
     }
-  }, [disabled])
+  }, [disabled, isProcessing])
 
   // 파일 입력 변경
   const handleInputChange = useCallback(
@@ -155,16 +201,27 @@ export function ImageUploader({
               ? 'border-forest-500 bg-forest-50 dark:bg-forest-900/20'
               : 'border-cream-300 hover:border-forest-400 dark:border-charcoal-600 dark:hover:border-forest-500'
           }
-          ${disabled ? 'cursor-not-allowed opacity-50' : ''}
+          ${disabled || isProcessing ? 'cursor-not-allowed opacity-50' : ''}
         `}
       >
-        <CameraIcon className="h-8 w-8 text-stone-400" />
-        <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
-          클릭하거나 이미지를 드래그하세요
-        </p>
-        <p className="mt-1 text-xs text-stone-400 dark:text-stone-500">
-          최대 {maxFiles}장, JPG/PNG/GIF/WebP (각 10MB 이하)
-        </p>
+        {isProcessing ? (
+          <>
+            <SpinnerIcon className="h-8 w-8 animate-spin text-forest-500" />
+            <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+              이미지 처리 중...
+            </p>
+          </>
+        ) : (
+          <>
+            <CameraIcon className="h-8 w-8 text-stone-400" />
+            <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+              클릭하거나 이미지를 드래그하세요
+            </p>
+            <p className="mt-1 text-xs text-stone-400 dark:text-stone-500">
+              최대 {maxFiles}장, JPG/PNG/GIF/WebP (각 10MB 이하)
+            </p>
+          </>
+        )}
       </div>
 
       {/* 숨겨진 파일 입력 */}
@@ -175,7 +232,7 @@ export function ImageUploader({
         multiple
         onChange={handleInputChange}
         className="hidden"
-        disabled={disabled}
+        disabled={disabled || isProcessing}
       />
 
       {/* 에러 메시지 */}
@@ -186,13 +243,25 @@ export function ImageUploader({
         <div className="flex flex-wrap gap-2">
           {files.map((file, index) => (
             <ImagePreview
-              key={`${file.name}-${index}`}
+              key={`${file.name}-${file.size}-${index}`}
               file={file}
               onRemove={() => removeFile(index)}
+              onEdit={() => openCropModal(index, file)}
               disabled={disabled}
             />
           ))}
         </div>
+      )}
+
+      {/* Crop 모달 */}
+      {cropTarget && (
+        <ImageCropModal
+          isOpen={true}
+          onClose={closeCropModal}
+          imageSrc={cropTarget.src}
+          fileName={cropTarget.fileName}
+          onComplete={handleCropComplete}
+        />
       )}
     </div>
   )
@@ -204,10 +273,11 @@ export function ImageUploader({
 interface ImagePreviewProps {
   file: File
   onRemove: () => void
+  onEdit: () => void
   disabled: boolean
 }
 
-function ImagePreview({ file, onRemove, disabled }: ImagePreviewProps) {
+function ImagePreview({ file, onRemove, onEdit, disabled }: ImagePreviewProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   // 로컬 URL 생성
@@ -227,14 +297,26 @@ function ImagePreview({ file, onRemove, disabled }: ImagePreviewProps) {
         />
       )}
       {!disabled && (
-        <button
-          type="button"
-          onClick={onRemove}
-          className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
-          title="제거"
-        >
-          <XIcon className="h-3 w-3" />
-        </button>
+        <>
+          {/* 편집 버튼 (hover 시 표시) */}
+          <button
+            type="button"
+            onClick={onEdit}
+            className="absolute inset-0 flex items-center justify-center rounded-lg bg-charcoal-900/0 transition-colors group-hover:bg-charcoal-900/40"
+            title="편집"
+          >
+            <EditIcon className="h-5 w-5 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+          </button>
+          {/* 제거 버튼 */}
+          <button
+            type="button"
+            onClick={onRemove}
+            className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
+            title="제거"
+          >
+            <XIcon className="h-3 w-3" />
+          </button>
+        </>
       )}
     </div>
   )
@@ -259,6 +341,39 @@ function CameraIcon({ className }: { className?: string }) {
         strokeLinejoin="round"
         strokeWidth={1.5}
         d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    </svg>
+  )
+}
+
+function SpinnerIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24">
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+      />
+    </svg>
+  )
+}
+
+function EditIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
       />
     </svg>
   )

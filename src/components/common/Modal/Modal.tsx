@@ -11,13 +11,14 @@ interface ModalProps {
   /** 모달 내용 */
   children: ReactNode
   /** 모달 크기 */
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
 const sizeStyles = {
   sm: 'max-w-sm',
   md: 'max-w-md',
   lg: 'max-w-lg',
+  xl: 'max-w-2xl',
 }
 
 /**
