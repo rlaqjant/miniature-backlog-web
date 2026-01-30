@@ -117,7 +117,7 @@ export function BacklogSteps({ items, onStatusChange, isUpdating, readonly }: Ba
                 {/* 상태 뱃지 */}
                 <span
                   className={`
-                    shrink-0 rounded-full px-3 py-1 text-xs font-medium
+                    shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium
                     ${style.badge}
                   `}
                 >
@@ -171,7 +171,7 @@ export function BacklogSteps({ items, onStatusChange, isUpdating, readonly }: Ba
               {/* 상태 뱃지 */}
               <span
                 className={`
-                  shrink-0 rounded-full px-3 py-1 text-xs font-medium
+                  shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium
                   ${style.badge}
                 `}
               >
