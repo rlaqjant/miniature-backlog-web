@@ -1,4 +1,5 @@
-import type { ProgressLogResponse } from '@/types'
+import { useCallback, useEffect, useState } from 'react'
+import type { ImageResponse, ProgressLogResponse } from '@/types'
 
 interface ProgressLogListProps {
   /** 진행 로그 목록 */
@@ -23,6 +24,16 @@ export function ProgressLogList({
   onDeleteLog,
   isDeletingLog,
 }: ProgressLogListProps) {
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
+  const [lightboxSlides, setLightboxSlides] = useState<{ src: string }[]>([])
+
+  const openLightbox = (images: ImageResponse[], index: number) => {
+    setLightboxSlides(images.map((img) => ({ src: img.imageUrl })))
+    setLightboxIndex(index)
+    setLightboxOpen(true)
+  }
+
   if (logs.length === 0) {
     return (
       <div className="rounded-2xl bg-white p-6 shadow-soft dark:bg-[#252219]">
@@ -73,7 +84,7 @@ export function ProgressLogList({
           return (
           <div
             key={log.id}
-            className={`group relative border-l-2 border-cream-300 pl-4 dark:border-charcoal-500${onEditLog ? ' cursor-pointer rounded-r-lg transition-colors hover:bg-cream-50 dark:hover:bg-charcoal-700/30' : ''}`}
+            className={`group relative border-l-2 border-cream-300 pl-4 dark:border-charcoal-600${onEditLog ? ' cursor-pointer rounded-r-lg transition-colors hover:bg-cream-50 dark:hover:bg-charcoal-700/30' : ''}`}
             onClick={onEditLog ? () => onEditLog(log) : undefined}
           >
             {/* 타임라인 도트 */}
@@ -131,19 +142,21 @@ export function ProgressLogList({
             {/* 이미지 */}
             {log.images && log.images.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
-                {log.images.map((image) => (
-                  <a
+                {log.images.map((image, idx) => (
+                  <button
                     key={image.id}
-                    href={image.imageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openLightbox(log.images!, idx)
+                    }}
                   >
                     <img
                       src={image.imageUrl}
                       alt={image.fileName}
                       className="h-20 w-20 rounded-lg object-cover transition-transform hover:scale-105"
                     />
-                  </a>
+                  </button>
                 ))}
               </div>
             )}
@@ -159,6 +172,15 @@ export function ProgressLogList({
           )
         })}
       </div>
+
+      {lightboxOpen && (
+        <ImageModal
+          slides={lightboxSlides}
+          index={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+          onIndexChange={setLightboxIndex}
+        />
+      )}
     </div>
   )
 }
@@ -225,5 +247,99 @@ function LockIcon() {
         d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
       />
     </svg>
+  )
+}
+
+/** 이미지 모달 뷰어 */
+function ImageModal({
+  slides,
+  index,
+  onClose,
+  onIndexChange,
+}: {
+  slides: { src: string }[]
+  index: number
+  onClose: () => void
+  onIndexChange: (index: number) => void
+}) {
+  const hasPrev = index > 0
+  const hasNext = index < slides.length - 1
+
+  const goPrev = useCallback(() => {
+    if (hasPrev) onIndexChange(index - 1)
+  }, [hasPrev, index, onIndexChange])
+
+  const goNext = useCallback(() => {
+    if (hasNext) onIndexChange(index + 1)
+  }, [hasNext, index, onIndexChange])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') goPrev()
+      if (e.key === 'ArrowRight') goNext()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose, goPrev, goNext])
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div
+        className="relative mx-4 max-h-[85vh] max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-charcoal-800"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* 닫기 버튼 */}
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white transition-colors hover:bg-black/60"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* 이미지 */}
+        <img
+          src={slides[index].src}
+          alt=""
+          className="max-h-[85vh] w-full object-contain"
+        />
+
+        {/* 이전 버튼 */}
+        {hasPrev && (
+          <button
+            onClick={goPrev}
+            className="absolute left-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white transition-colors hover:bg-black/60"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        )}
+
+        {/* 다음 버튼 */}
+        {hasNext && (
+          <button
+            onClick={goNext}
+            className="absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white transition-colors hover:bg-black/60"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        )}
+
+        {/* 이미지 카운터 */}
+        {slides.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/40 px-3 py-1 text-sm text-white">
+            {index + 1} / {slides.length}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }

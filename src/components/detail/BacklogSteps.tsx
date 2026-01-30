@@ -21,7 +21,7 @@ const statusStyles: Record<BacklogItemStatus, {
   text: string
 }> = {
   TODO: {
-    card: 'bg-cream-50 border-cream-200 dark:bg-charcoal-600 dark:border-charcoal-500',
+    card: 'bg-cream-50 border-cream-200 dark:bg-charcoal-600 dark:border-charcoal-600',
     badge: 'bg-cream-300 text-charcoal-500 dark:bg-charcoal-500 dark:text-cream-200',
     label: 'text-stone-400 dark:text-cream-300',
     text: '시작 전',

@@ -36,7 +36,7 @@ export function Card({
       className={`
         overflow-hidden rounded-2xl border border-cream-200 bg-cream-100
         shadow-soft
-        dark:border-charcoal-500 dark:bg-[#252219]
+        dark:border-charcoal-600 dark:bg-[#252219]
         ${hoverable ? 'transition-all duration-300 hover:shadow-soft-lg hover:-translate-y-0.5' : ''}
         ${className}
       `}
@@ -44,7 +44,7 @@ export function Card({
     >
       {/* 헤더 */}
       {header && (
-        <div className="border-b border-cream-200 px-6 py-4 dark:border-charcoal-500">
+        <div className="border-b border-cream-200 px-6 py-4 dark:border-charcoal-600">
           {header}
         </div>
       )}
@@ -56,7 +56,7 @@ export function Card({
 
       {/* 푸터 */}
       {footer && (
-        <div className="border-t border-cream-200 px-6 py-4 dark:border-charcoal-500">
+        <div className="border-t border-cream-200 px-6 py-4 dark:border-charcoal-600">
           {footer}
         </div>
       )}

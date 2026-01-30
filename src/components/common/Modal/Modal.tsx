@@ -96,7 +96,7 @@ export function Modal({
       >
         {/* 헤더 */}
         {title && (
-          <div className="flex items-center justify-between border-b border-cream-200 px-6 py-5 dark:border-charcoal-500">
+          <div className="flex items-center justify-between border-b border-cream-200 px-6 py-5 dark:border-charcoal-600">
             <h2
               id="modal-title"
               className="font-display text-xl font-semibold text-charcoal-900 dark:text-cream-50"

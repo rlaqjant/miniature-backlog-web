@@ -70,7 +70,7 @@ export function MiniatureInfo({
       </div>
 
       {/* 공개 설정 */}
-      <div className="mt-6 flex items-center justify-between border-t border-cream-200 pt-5 dark:border-charcoal-500">
+      <div className="mt-6 flex items-center justify-between border-t border-cream-200 pt-5 dark:border-charcoal-600">
         <div>
           <span className="text-sm font-medium text-charcoal-500 dark:text-cream-200">
             공개 설정

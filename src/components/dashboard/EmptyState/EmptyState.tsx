@@ -22,7 +22,7 @@ export function EmptyState({
   onAction,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-cream-300 bg-cream-50 px-8 py-16 dark:border-charcoal-500 dark:bg-[#1a1814]">
+    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-cream-300 bg-cream-50 px-8 py-16 dark:border-charcoal-600 dark:bg-[#1a1814]">
       {/* 아이콘 */}
       <div className="mb-6 rounded-full bg-cream-200 p-5 dark:bg-charcoal-500">
         <svg

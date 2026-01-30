@@ -49,7 +49,7 @@ export function PublicBoardPage() {
 
       {/* 빈 상태 */}
       {!isLoading && !error && miniatures.length === 0 && (
-        <div className="rounded-2xl border border-cream-200 bg-cream-100 p-12 text-center dark:border-charcoal-500 dark:bg-[#252219]">
+        <div className="rounded-2xl border border-cream-200 bg-cream-100 p-12 text-center dark:border-charcoal-600 dark:bg-[#252219]">
           <svg
             className="mx-auto mb-4 h-16 w-16 text-stone-300 dark:text-charcoal-400"
             fill="none"

@@ -34,14 +34,14 @@ export function AddProgressLogModal({
   uploadProgress,
 }: AddProgressLogModalProps) {
   const [content, setContent] = useState('')
-  const [isPublic, setIsPublic] = useState(false)
+  const [isPublic, setIsPublic] = useState(true)
   const [files, setFiles] = useState<File[]>([])
   const [error, setError] = useState<string | null>(null)
 
   // 폼 초기화
   const resetForm = useCallback(() => {
     setContent('')
-    setIsPublic(false)
+    setIsPublic(true)
     setFiles([])
     setError(null)
   }, [])
@@ -126,22 +126,27 @@ export function AddProgressLogModal({
           />
         </div>
 
-        {/* 공개 여부 */}
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="isPublic"
-            checked={isPublic}
-            onChange={(e) => setIsPublic(e.target.checked)}
-            disabled={isSaving}
-            className="h-4 w-4 rounded border-cream-300 text-forest-600 focus:ring-forest-500 dark:border-charcoal-500"
-          />
-          <label
-            htmlFor="isPublic"
-            className="text-sm text-charcoal-700 dark:text-cream-200"
-          >
-            공개 게시판에 공유
-          </label>
+        {/* 비공개 여부 */}
+        <div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="isPrivate"
+              checked={!isPublic}
+              onChange={(e) => setIsPublic(!e.target.checked)}
+              disabled={isSaving}
+              className="h-4 w-4 rounded border-cream-300 text-forest-600 focus:ring-forest-500 dark:border-charcoal-600"
+            />
+            <label
+              htmlFor="isPrivate"
+              className="text-sm text-charcoal-700 dark:text-cream-200"
+            >
+              비공개
+            </label>
+          </div>
+          <p className="mt-1 ml-6 text-xs text-stone-400">
+            비공개 작업은 공개 백로그에서 숨겨집니다.
+          </p>
         </div>
 
         {/* 에러 메시지 */}

@@ -153,7 +153,7 @@ export function ImageUploader({
           ${
             isDragging
               ? 'border-forest-500 bg-forest-50 dark:bg-forest-900/20'
-              : 'border-cream-300 hover:border-forest-400 dark:border-charcoal-500 dark:hover:border-forest-500'
+              : 'border-cream-300 hover:border-forest-400 dark:border-charcoal-600 dark:hover:border-forest-500'
           }
           ${disabled ? 'cursor-not-allowed opacity-50' : ''}
         `}

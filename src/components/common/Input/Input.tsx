@@ -74,7 +74,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               ${rightIcon ? 'pr-11' : ''}
               ${hasError
                 ? 'border-[#c75f5f] focus:border-[#c75f5f] focus:ring-2 focus:ring-[#c75f5f]/20'
-                : 'border-cream-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 dark:border-charcoal-500'
+                : 'border-cream-200 focus:border-forest-500 focus:ring-2 focus:ring-forest-500/20 dark:border-charcoal-600'
               }
               ${className}
             `}
