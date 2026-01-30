@@ -77,12 +77,14 @@ export function Header() {
 
             {isAuthenticated ? (
               <>
-                <span className="text-sm font-medium text-charcoal-500 dark:text-cream-200">
+                <span className="hidden sm:inline text-sm font-medium text-charcoal-500 dark:text-cream-200">
                   {user?.nickname}님
                 </span>
-                <Button variant="outline" size="sm" onClick={logout}>
-                  로그아웃
-                </Button>
+                <span className="hidden sm:inline">
+                  <Button variant="outline" size="sm" onClick={logout}>
+                    로그아웃
+                  </Button>
+                </span>
               </>
             ) : (
               <>
@@ -112,6 +114,15 @@ export function Header() {
             <div className="flex flex-col gap-2">
               {isAuthenticated ? (
                 <>
+                  {/* 사용자 정보 (sm 미만에서만 표시) */}
+                  <div className="sm:hidden flex items-center justify-between rounded-lg px-4 py-3 mb-1 border-b border-cream-200 dark:border-charcoal-600">
+                    <span className="text-sm font-medium text-charcoal-500 dark:text-cream-200">
+                      {user?.nickname}님
+                    </span>
+                    <Button variant="outline" size="sm" onClick={logout}>
+                      로그아웃
+                    </Button>
+                  </div>
                   <Link
                     to="/board"
                     className="rounded-lg px-4 py-3 text-base font-medium text-charcoal-700 hover:bg-cream-200 transition-colors dark:text-cream-200 dark:hover:bg-charcoal-600"
