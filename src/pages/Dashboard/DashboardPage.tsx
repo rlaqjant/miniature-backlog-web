@@ -122,7 +122,7 @@ export function DashboardPage() {
   const closeModal = () => setIsModalOpen(false)
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
+    <div className="mx-auto max-w-screen-2xl px-6 py-12">
       {/* 헤더 */}
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>

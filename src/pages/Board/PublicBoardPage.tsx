@@ -17,7 +17,7 @@ export function PublicBoardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
+    <div className="mx-auto max-w-screen-2xl px-6 py-12">
       {/* 헤더 */}
       <div className="mb-10">
         <h1 className="font-display text-3xl font-bold text-charcoal-900 dark:text-cream-50">

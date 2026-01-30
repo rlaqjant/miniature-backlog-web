@@ -79,7 +79,7 @@ export function DashboardFilter({
 
       {/* 뷰 모드 토글 */}
       {showViewToggle && onViewModeChange && (
-        <div className="flex rounded-lg border border-cream-200 dark:border-charcoal-600" role="group" aria-label="뷰 모드">
+        <div className="ml-auto flex rounded-lg border border-cream-200 dark:border-charcoal-600" role="group" aria-label="뷰 모드">
           <button
             type="button"
             onClick={() => onViewModeChange('card')}
