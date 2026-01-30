@@ -1,29 +1,19 @@
-import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { usePublicBoard } from '@hooks/usePublicBoard'
 import { Spinner, Pagination } from '@components/common'
-import { PublicLogCard } from '@components/board/PublicLogCard'
-import { PublicLogDetailModal } from '@components/board/PublicLogDetailModal'
-import type { ProgressLogResponse } from '@/types'
+import { PublicMiniatureCard } from '@components/board/PublicMiniatureCard'
 
 /**
  * 공개 게시판 페이지
- * 공개 설정된 진행 로그를 누구나 조회 가능
+ * 공개 설정된 미니어처를 카드 목록으로 표시
  */
 export function PublicBoardPage() {
-  const { logs, isLoading, error, page, totalPages, hasNext, hasPrevious, goToPage, refetch } =
+  const { miniatures, isLoading, error, page, totalPages, hasNext, hasPrevious, goToPage, refetch } =
     usePublicBoard()
+  const navigate = useNavigate()
 
-  const [selectedLog, setSelectedLog] = useState<ProgressLogResponse | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const handleCardClick = (log: ProgressLogResponse) => {
-    setSelectedLog(log)
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedLog(null)
+  const handleCardClick = (id: number) => {
+    navigate(`/board/${id}`)
   }
 
   return (
@@ -33,7 +23,7 @@ export function PublicBoardPage() {
         <h1 className="font-display text-3xl font-bold text-charcoal-900 dark:text-cream-50">
           공개 게시판
         </h1>
-        <p className="mt-2 text-stone-500">다른 페인터들의 도색 진행 기록을 구경해보세요</p>
+        <p className="mt-2 text-stone-500">다른 페인터들의 도색 작업을 구경해보세요</p>
       </div>
 
       {/* 로딩 상태 */}
@@ -58,7 +48,7 @@ export function PublicBoardPage() {
       )}
 
       {/* 빈 상태 */}
-      {!isLoading && !error && logs.length === 0 && (
+      {!isLoading && !error && miniatures.length === 0 && (
         <div className="rounded-2xl border border-cream-200 bg-cream-100 p-12 text-center dark:border-charcoal-500 dark:bg-[#252219]">
           <svg
             className="mx-auto mb-4 h-16 w-16 text-stone-300 dark:text-charcoal-400"
@@ -74,20 +64,20 @@ export function PublicBoardPage() {
             />
           </svg>
           <p className="text-lg font-medium text-charcoal-500 dark:text-cream-200">
-            아직 공개된 진행 기록이 없습니다
+            아직 공개된 작업이 없습니다
           </p>
           <p className="mt-1 text-sm text-stone-400">
-            첫 번째로 도색 기록을 공유해보세요!
+            첫 번째로 도색 작업을 공유해보세요!
           </p>
         </div>
       )}
 
       {/* 카드 그리드 */}
-      {!isLoading && !error && logs.length > 0 && (
+      {!isLoading && !error && miniatures.length > 0 && (
         <>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {logs.map((log) => (
-              <PublicLogCard key={log.id} log={log} onClick={handleCardClick} />
+            {miniatures.map((miniature) => (
+              <PublicMiniatureCard key={miniature.id} miniature={miniature} onClick={handleCardClick} />
             ))}
           </div>
 
@@ -103,13 +93,6 @@ export function PublicBoardPage() {
           </div>
         </>
       )}
-
-      {/* 상세 모달 */}
-      <PublicLogDetailModal
-        log={selectedLog}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-      />
     </div>
   )
 }

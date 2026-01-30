@@ -51,6 +51,12 @@ npm run preview  # 빌드 결과 미리보기
 - Base URL: `VITE_API_BASE_URL` 환경변수
 - 모든 API 호출은 `services/api/` 디렉토리에서 관리
 
+**UI 액션 제어 패턴**
+- 수정/삭제 등 액션 버튼은 핸들러(`onEdit`, `onDelete`) 존재 여부로 표시 여부 결정
+- 프론트엔드에서 `userId` 비교로 소유권 검증하지 않음 (user.id 신뢰성 문제)
+- 소유권 검증은 백엔드 API 엔드포인트가 담당
+- 참고: `MiniatureInfo`, `ProgressLogList` 등 동일 패턴 적용
+
 ### 환경 변수
 ```
 VITE_API_BASE_URL   # API 서버 URL (기본: http://localhost:8080)

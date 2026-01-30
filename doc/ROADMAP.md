@@ -332,7 +332,7 @@ src/
 - 개별 이미지 업로드 실패 시 건너뛰기 (부분 성공 허용)
 - 이미지 드래그 앤 드롭 + 클릭 선택
 - 로컬 미리보기 (URL.createObjectURL)
-- 본인 로그만 삭제 가능 (userId 확인)
+- 수정/삭제 버튼은 핸들러 존재 여부로 표시 (소유권 검증은 백엔드 담당)
 
 ### 진행 예정 항목
 - [ ] 진행 로그 수정 기능
@@ -502,6 +502,7 @@ package.json                          # date-fns, yet-another-react-lightbox 의
 | 2026-01-27 | Phase 7 완료 - 공개 게시판 페이지(/board), 카드 그리드, 상세 모달, 라이트박스, 페이지네이션 공통 컴포넌트, 이미지 ORB 차단 대응, date-fns/yet-another-react-lightbox 의존성 추가 |
 | 2026-01-27 | M3 마일스톤 완료 - 핵심 기능 전체 구현 (백로그 관리 + 진행 로그 + 이미지 업로드 + 공개 게시판) |
 | 2026-01-27 | 게시판 접근 정책 변경 - 공개 게시판을 로그인 사용자 전용으로 전환 (프론트엔드: /board를 ProtectedRoute 하위로 이동, 헤더 링크 인증 조건 추가 / 백엔드: SecurityConfig /public/** permitAll 제거) |
+| 2026-01-30 | ProgressLogList 수정/삭제 버튼 미표시 버그 수정 - isOwner(userId 비교) 체크 제거, 핸들러 존재 여부로 UI 제어하도록 변경. 원인: 로그인 API가 user 데이터를 반환하지 않아 user.id가 빈 문자열로 저장됨 |
 
 ---
 

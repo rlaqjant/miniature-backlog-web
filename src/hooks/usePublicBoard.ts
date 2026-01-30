@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react'
-import { progressLogApi } from '@services/api'
-import type { ProgressLogResponse } from '@/types'
+import { miniatureApi } from '@services/api'
+import type { PublicMiniature } from '@/types'
 
 interface UsePublicBoard {
-  logs: ProgressLogResponse[]
+  miniatures: PublicMiniature[]
   isLoading: boolean
   error: string | null
   page: number
@@ -16,10 +16,10 @@ interface UsePublicBoard {
 
 /**
  * 공개 게시판 데이터 로딩 훅
- * 페이지네이션, 로딩/에러 상태 관리
+ * 공개 미니어처 목록 조회, 페이지네이션, 로딩/에러 상태 관리
  */
 export function usePublicBoard(size = 12): UsePublicBoard {
-  const [logs, setLogs] = useState<ProgressLogResponse[]>([])
+  const [miniatures, setMiniatures] = useState<PublicMiniature[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(0)
@@ -27,12 +27,12 @@ export function usePublicBoard(size = 12): UsePublicBoard {
   const [hasNext, setHasNext] = useState(false)
   const [hasPrevious, setHasPrevious] = useState(false)
 
-  const fetchLogs = useCallback(async (targetPage: number) => {
+  const fetchMiniatures = useCallback(async (targetPage: number) => {
     try {
       setIsLoading(true)
       setError(null)
-      const data = await progressLogApi.getPublic({ page: targetPage, size })
-      setLogs(data.content)
+      const data = await miniatureApi.getPublicList({ page: targetPage, size })
+      setMiniatures(data.content)
       setPage(data.page)
       setTotalPages(data.totalPages)
       setHasNext(data.hasNext)
@@ -46,19 +46,19 @@ export function usePublicBoard(size = 12): UsePublicBoard {
   }, [size])
 
   useEffect(() => {
-    fetchLogs(page)
-  }, [fetchLogs, page])
+    fetchMiniatures(page)
+  }, [fetchMiniatures, page])
 
   const goToPage = useCallback((targetPage: number) => {
     setPage(targetPage)
   }, [])
 
   const refetch = useCallback(async () => {
-    await fetchLogs(page)
-  }, [fetchLogs, page])
+    await fetchMiniatures(page)
+  }, [fetchMiniatures, page])
 
   return {
-    logs,
+    miniatures,
     isLoading,
     error,
     page,

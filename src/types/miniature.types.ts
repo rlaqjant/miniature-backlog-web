@@ -57,3 +57,17 @@ export interface UpdateMiniatureRequest {
 export interface UpdateBacklogItemRequest {
   status: BacklogItemStatus
 }
+
+/**
+ * 공개 미니어처 목록 응답 (작성자 정보 포함)
+ */
+export interface PublicMiniature extends Miniature {
+  userNickname: string
+}
+
+/**
+ * 공개 미니어처 상세 응답
+ */
+export interface PublicMiniatureDetail extends MiniatureDetail {
+  userNickname: string
+}

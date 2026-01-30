@@ -6,6 +6,7 @@ import type {
   BacklogItemStatus,
   UpdateMiniatureRequest,
   ProgressLogResponse,
+  ProgressLogUpdateRequest,
 } from '@/types'
 
 /**
@@ -41,10 +42,14 @@ interface UseMiniatureDetail {
   isDeleting: boolean
   /** 진행 로그 생성 */
   createProgressLog: (content: string, isPublic: boolean, files?: File[]) => Promise<void>
+  /** 진행 로그 수정 */
+  updateProgressLog: (logId: number, data: ProgressLogUpdateRequest) => Promise<void>
   /** 진행 로그 삭제 */
   deleteProgressLog: (logId: number) => Promise<void>
   /** 진행 로그 생성 중 */
   isCreatingLog: boolean
+  /** 진행 로그 수정 중 */
+  isUpdatingLog: boolean
   /** 진행 로그 삭제 중 */
   isDeletingLog: boolean
   /** 업로드 진행 상태 */
@@ -63,6 +68,7 @@ export function useMiniatureDetail(id: number): UseMiniatureDetail {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isCreatingLog, setIsCreatingLog] = useState(false)
+  const [isUpdatingLog, setIsUpdatingLog] = useState(false)
   const [isDeletingLog, setIsDeletingLog] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null)
 
@@ -234,6 +240,30 @@ export function useMiniatureDetail(id: number): UseMiniatureDetail {
     [id]
   )
 
+  // 진행 로그 수정
+  const updateProgressLog = useCallback(
+    async (logId: number, data: ProgressLogUpdateRequest) => {
+      setIsUpdatingLog(true)
+      setError(null)
+
+      try {
+        await progressLogApi.update(logId, data)
+
+        // 목록 새로고침
+        const logsData = await progressLogApi.getByMiniature(id, { page: 0, size: 10 })
+        setProgressLogs(logsData.content)
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : '진행 로그 수정에 실패했습니다'
+        setError(message)
+        throw err
+      } finally {
+        setIsUpdatingLog(false)
+      }
+    },
+    [id]
+  )
+
   // 진행 로그 삭제
   const deleteProgressLog = useCallback(
     async (logId: number) => {
@@ -270,8 +300,10 @@ export function useMiniatureDetail(id: number): UseMiniatureDetail {
     isUpdating,
     isDeleting,
     createProgressLog,
+    updateProgressLog,
     deleteProgressLog,
     isCreatingLog,
+    isUpdatingLog,
     isDeletingLog,
     uploadProgress,
   }

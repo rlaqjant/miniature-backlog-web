@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router'
 import { MainLayout } from '@/components/layout'
-import { HomePage, NotFoundPage, LoginPage, RegisterPage, DashboardPage, MiniatureDetailPage, PublicBoardPage } from '@/pages'
+import { HomePage, NotFoundPage, LoginPage, RegisterPage, DashboardPage, MiniatureDetailPage, PublicBoardPage, PublicMiniatureDetailPage } from '@/pages'
 import { ProtectedRoute } from './ProtectedRoute'
 import { GuestRoute } from './GuestRoute'
 
@@ -49,6 +49,10 @@ export const router = createBrowserRouter([
           {
             path: 'board',
             element: <PublicBoardPage />,
+          },
+          {
+            path: 'board/:miniatureId',
+            element: <PublicMiniatureDetailPage />,
           },
         ],
       },

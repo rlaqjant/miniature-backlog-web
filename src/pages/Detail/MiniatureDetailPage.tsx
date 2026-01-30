@@ -8,7 +8,9 @@ import {
   EditMiniatureModal,
   DeleteConfirmModal,
   AddProgressLogModal,
+  EditProgressLogModal,
 } from '@/components/detail'
+import type { ProgressLogResponse, ProgressLogUpdateRequest } from '@/types'
 import { useMiniatureDetail } from '@/hooks/useMiniatureDetail'
 
 /**
@@ -22,6 +24,7 @@ export function MiniatureDetailPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isAddLogModalOpen, setIsAddLogModalOpen] = useState(false)
+  const [logToEdit, setLogToEdit] = useState<ProgressLogResponse | null>(null)
   const [logToDelete, setLogToDelete] = useState<number | null>(null)
 
   const {
@@ -35,11 +38,29 @@ export function MiniatureDetailPage() {
     isUpdating,
     isDeleting,
     createProgressLog,
+    updateProgressLog,
     deleteProgressLog,
     isCreatingLog,
+    isUpdatingLog,
     isDeletingLog,
     uploadProgress,
   } = useMiniatureDetail(miniatureId)
+
+  // 진행 로그 수정 요청
+  const handleEditLog = useCallback((log: ProgressLogResponse) => {
+    setLogToEdit(log)
+  }, [])
+
+  // 진행 로그 수정 저장
+  const handleEditLogSave = useCallback(
+    async (data: ProgressLogUpdateRequest) => {
+      if (logToEdit) {
+        await updateProgressLog(logToEdit.id, data)
+        setLogToEdit(null)
+      }
+    },
+    [logToEdit, updateProgressLog]
+  )
 
   // 진행 로그 삭제 요청
   const handleDeleteLogRequest = useCallback((logId: number) => {
@@ -136,6 +157,7 @@ export function MiniatureDetailPage() {
         <ProgressLogList
           logs={progressLogs}
           onAddLog={() => setIsAddLogModalOpen(true)}
+          onEditLog={handleEditLog}
           onDeleteLog={handleDeleteLogRequest}
           isDeletingLog={isDeletingLog}
         />
@@ -157,6 +179,16 @@ export function MiniatureDetailPage() {
         itemName={miniature.title}
         onConfirm={deleteMiniature}
         isDeleting={isDeleting}
+      />
+
+      {/* 진행 로그 수정 모달 */}
+      <EditProgressLogModal
+        key={logToEdit?.id}
+        isOpen={logToEdit !== null}
+        onClose={() => setLogToEdit(null)}
+        log={logToEdit}
+        onSave={handleEditLogSave}
+        isSaving={isUpdatingLog}
       />
 
       {/* 진행 로그 추가 모달 */}

@@ -1,4 +1,3 @@
-import { useAuthStore } from '@/stores/authStore'
 import type { ProgressLogResponse } from '@/types'
 
 interface ProgressLogListProps {
@@ -6,6 +5,8 @@ interface ProgressLogListProps {
   logs: ProgressLogResponse[]
   /** 기록 추가 버튼 클릭 핸들러 */
   onAddLog?: () => void
+  /** 로그 수정 핸들러 */
+  onEditLog?: (log: ProgressLogResponse) => void
   /** 로그 삭제 핸들러 */
   onDeleteLog?: (logId: number) => void
   /** 삭제 중 상태 */
@@ -18,12 +19,10 @@ interface ProgressLogListProps {
 export function ProgressLogList({
   logs,
   onAddLog,
+  onEditLog,
   onDeleteLog,
   isDeletingLog,
 }: ProgressLogListProps) {
-  const { user } = useAuthStore()
-  const currentUserId = user?.id
-
   if (logs.length === 0) {
     return (
       <div className="rounded-2xl bg-white p-6 shadow-soft dark:bg-[#252219]">
@@ -70,15 +69,17 @@ export function ProgressLogList({
       </div>
 
       <div className="mt-5 space-y-4">
-        {logs.map((log) => (
+        {logs.map((log) => {
+          return (
           <div
             key={log.id}
-            className="group relative border-l-2 border-cream-300 pl-4 dark:border-charcoal-500"
+            className={`group relative border-l-2 border-cream-300 pl-4 dark:border-charcoal-500${onEditLog ? ' cursor-pointer rounded-r-lg transition-colors hover:bg-cream-50 dark:hover:bg-charcoal-700/30' : ''}`}
+            onClick={onEditLog ? () => onEditLog(log) : undefined}
           >
             {/* 타임라인 도트 */}
             <div className="absolute -left-[5px] top-0 h-2 w-2 rounded-full bg-forest-500" />
 
-            {/* 헤더: 날짜 + 삭제 버튼 */}
+            {/* 헤더: 날짜 + 액션 버튼 */}
             <div className="flex items-center justify-between">
               <time className="text-xs text-stone-500">
                 {new Date(log.createdAt).toLocaleDateString('ko-KR', {
@@ -90,16 +91,35 @@ export function ProgressLogList({
                 })}
               </time>
 
-              {/* 본인 로그만 삭제 가능 */}
-              {onDeleteLog && currentUserId === log.userId && (
-                <button
-                  onClick={() => onDeleteLog(log.id)}
-                  disabled={isDeletingLog}
-                  className="opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-50"
-                  title="삭제"
-                >
-                  <TrashIcon className="h-4 w-4 text-stone-400 hover:text-red-500" />
-                </button>
+              {/* 수정/삭제 버튼 */}
+              {(onEditLog || onDeleteLog) && (
+                <div className="flex items-center gap-1">
+                  {onEditLog && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEditLog(log)
+                      }}
+                      className="opacity-0 transition-opacity group-hover:opacity-100"
+                      title="수정"
+                    >
+                      <PencilIcon className="h-4 w-4 text-stone-400 hover:text-forest-500" />
+                    </button>
+                  )}
+                  {onDeleteLog && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onDeleteLog(log.id)
+                      }}
+                      disabled={isDeletingLog}
+                      className="opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-50"
+                      title="삭제"
+                    >
+                      <TrashIcon className="h-4 w-4 text-stone-400 hover:text-red-500" />
+                    </button>
+                  )}
+                </div>
               )}
             </div>
 
@@ -136,7 +156,8 @@ export function ProgressLogList({
               </span>
             )}
           </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
@@ -146,6 +167,19 @@ function PlusIcon() {
   return (
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    </svg>
+  )
+}
+
+function PencilIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+      />
     </svg>
   )
 }

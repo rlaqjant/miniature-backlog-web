@@ -61,4 +61,19 @@ export const progressLogApi = {
   delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/progress-logs/${id}`)
   },
+
+  /**
+   * 공개 미니어처의 진행 로그 목록 조회
+   * GET /public/miniatures/{id}/progress-logs
+   */
+  getPublicByMiniature: async (
+    miniatureId: number,
+    params?: PaginationParams
+  ): Promise<PageResponse<ProgressLogResponse>> => {
+    const response = await apiClient.get<PageResponse<ProgressLogResponse>>(
+      `/public/miniatures/${miniatureId}/progress-logs`,
+      { params }
+    )
+    return response.data
+  },
 }

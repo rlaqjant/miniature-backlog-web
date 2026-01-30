@@ -4,28 +4,38 @@ interface BacklogStepsProps {
   /** 백로그 아이템 목록 */
   items: BacklogItem[]
   /** 상태 변경 핸들러 */
-  onStatusChange: (itemId: number, status: BacklogItemStatus) => Promise<void>
+  onStatusChange?: (itemId: number, status: BacklogItemStatus) => Promise<void>
   /** 업데이트 중 */
   isUpdating?: boolean
+  /** 읽기 전용 모드 */
+  readonly?: boolean
 }
 
 /**
  * 상태별 스타일 정의
  */
-const statusStyles: Record<BacklogItemStatus, { bg: string; icon: string; text: string }> = {
+const statusStyles: Record<BacklogItemStatus, {
+  card: string
+  badge: string
+  label: string
+  text: string
+}> = {
   TODO: {
-    bg: 'bg-cream-100 dark:bg-charcoal-600',
-    icon: 'text-stone-400',
+    card: 'bg-cream-50 border-cream-200 dark:bg-charcoal-600 dark:border-charcoal-500',
+    badge: 'bg-cream-300 text-charcoal-500 dark:bg-charcoal-500 dark:text-cream-200',
+    label: 'text-stone-400 dark:text-cream-300',
     text: '시작 전',
   },
   IN_PROGRESS: {
-    bg: 'bg-gold-100 dark:bg-gold-900/30',
-    icon: 'text-gold-500',
+    card: 'bg-gold-50 border-gold-300 dark:bg-gold-900/30 dark:border-gold-700',
+    badge: 'bg-gold-500 text-charcoal-900',
+    label: 'text-charcoal-700 dark:text-cream-200',
     text: '진행 중',
   },
   DONE: {
-    bg: 'bg-forest-100 dark:bg-forest-900/30',
-    icon: 'text-forest-500',
+    card: 'bg-forest-50 border-forest-200 dark:bg-forest-900/30 dark:border-forest-700',
+    badge: 'bg-forest-500 text-cream-50',
+    label: 'text-forest-600 dark:text-forest-400',
     text: '완료',
   },
 }
@@ -44,12 +54,12 @@ const getNextStatus = (current: BacklogItemStatus): BacklogItemStatus => {
 /**
  * 5단계 백로그 상태 관리 컴포넌트
  */
-export function BacklogSteps({ items, onStatusChange, isUpdating }: BacklogStepsProps) {
+export function BacklogSteps({ items, onStatusChange, isUpdating, readonly }: BacklogStepsProps) {
   // orderIndex로 정렬
   const sortedItems = [...items].sort((a, b) => a.orderIndex - b.orderIndex)
 
   const handleClick = async (item: BacklogItem) => {
-    if (isUpdating) return
+    if (isUpdating || readonly || !onStatusChange) return
     const nextStatus = getNextStatus(item.status)
     await onStatusChange(item.id, nextStatus)
   }
@@ -59,12 +69,63 @@ export function BacklogSteps({ items, onStatusChange, isUpdating }: BacklogSteps
       <h2 className="font-display text-lg font-semibold text-charcoal-900 dark:text-cream-50">
         작업 단계
       </h2>
-      <p className="mt-1 text-sm text-stone-500">각 단계를 클릭하여 상태를 변경하세요</p>
+      {!readonly && (
+        <p className="mt-1 text-sm text-stone-500">각 단계를 클릭하여 상태를 변경하세요</p>
+      )}
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 grid grid-cols-3 sm:grid-cols-5 gap-3">
         {sortedItems.map((item, index) => {
           const style = statusStyles[item.status]
           const stepName = item.stepName
+
+          if (readonly) {
+            return (
+              <div
+                key={item.id}
+                className={`
+                  flex flex-col items-center gap-3 p-4 rounded-xl border
+                  ${style.card}
+                `}
+              >
+                {/* 원형 배지 */}
+                <div
+                  className={`
+                    flex h-9 w-9 shrink-0 items-center justify-center
+                    rounded-full text-sm font-bold
+                    ${style.badge}
+                  `}
+                >
+                  {item.status === 'DONE' ? (
+                    <CheckIcon />
+                  ) : item.status === 'IN_PROGRESS' ? (
+                    <SpinnerIcon />
+                  ) : (
+                    index + 1
+                  )}
+                </div>
+
+                {/* 단계 이름 */}
+                <span
+                  className={`
+                    text-center text-sm font-medium
+                    ${style.label}
+                  `}
+                >
+                  {stepName}
+                </span>
+
+                {/* 상태 뱃지 */}
+                <span
+                  className={`
+                    shrink-0 rounded-full px-3 py-1 text-xs font-medium
+                    ${style.badge}
+                  `}
+                >
+                  {style.text}
+                </span>
+              </div>
+            )
+          }
 
           return (
             <button
@@ -73,24 +134,19 @@ export function BacklogSteps({ items, onStatusChange, isUpdating }: BacklogSteps
               onClick={() => handleClick(item)}
               disabled={isUpdating}
               className={`
-                w-full flex items-center gap-4 p-4 rounded-xl
+                flex flex-col items-center gap-3 p-4 rounded-xl border
                 transition-all duration-200
                 hover:shadow-md
                 disabled:cursor-not-allowed disabled:opacity-50
-                ${style.bg}
+                ${style.card}
               `}
             >
-              {/* 단계 번호 */}
+              {/* 원형 배지 */}
               <div
                 className={`
-                  flex h-8 w-8 shrink-0 items-center justify-center
+                  flex h-9 w-9 shrink-0 items-center justify-center
                   rounded-full text-sm font-bold
-                  ${item.status === 'DONE'
-                    ? 'bg-forest-500 text-cream-50'
-                    : item.status === 'IN_PROGRESS'
-                      ? 'bg-gold-500 text-charcoal-900'
-                      : 'bg-cream-300 text-charcoal-500 dark:bg-charcoal-500 dark:text-cream-200'
-                  }
+                  ${style.badge}
                 `}
               >
                 {item.status === 'DONE' ? (
@@ -103,30 +159,20 @@ export function BacklogSteps({ items, onStatusChange, isUpdating }: BacklogSteps
               </div>
 
               {/* 단계 이름 */}
-              <div className="flex-1 text-left">
-                <span
-                  className={`
-                    font-medium
-                    ${item.status === 'DONE'
-                      ? 'text-forest-600 dark:text-forest-400'
-                      : 'text-charcoal-700 dark:text-cream-200'
-                    }
-                  `}
-                >
-                  {stepName}
-                </span>
-              </div>
+              <span
+                className={`
+                  text-center text-sm font-medium
+                  ${style.label}
+                `}
+              >
+                {stepName}
+              </span>
 
               {/* 상태 뱃지 */}
               <span
                 className={`
                   shrink-0 rounded-full px-3 py-1 text-xs font-medium
-                  ${item.status === 'DONE'
-                    ? 'bg-forest-500 text-cream-50'
-                    : item.status === 'IN_PROGRESS'
-                      ? 'bg-gold-500 text-charcoal-900'
-                      : 'bg-cream-300 text-charcoal-500 dark:bg-charcoal-600 dark:text-cream-300'
-                  }
+                  ${style.badge}
                 `}
               >
                 {style.text}
@@ -137,10 +183,12 @@ export function BacklogSteps({ items, onStatusChange, isUpdating }: BacklogSteps
       </div>
 
       {/* 안내 문구 */}
-      <div className="mt-4 flex items-center gap-2 text-xs text-stone-500">
-        <InfoIcon />
-        <span>상태 순환: 시작 전 → 진행 중 → 완료 → 시작 전</span>
-      </div>
+      {!readonly && (
+        <div className="mt-4 flex items-center gap-2 text-xs text-stone-500">
+          <InfoIcon />
+          <span>상태 순환: 시작 전 → 진행 중 → 완료 → 시작 전</span>
+        </div>
+      )}
     </div>
   )
 }

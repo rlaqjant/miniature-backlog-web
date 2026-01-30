@@ -4,6 +4,10 @@ import type {
   MiniatureDetail,
   CreateMiniatureRequest,
   UpdateMiniatureRequest,
+  PublicMiniature,
+  PublicMiniatureDetail,
+  PageResponse,
+  PaginationParams,
 } from '@/types'
 
 /**
@@ -47,5 +51,26 @@ export const miniatureApi = {
    */
   delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/miniatures/${id}`)
+  },
+
+  /**
+   * 공개 미니어처 목록 조회
+   * GET /public/miniatures
+   */
+  getPublicList: async (params?: PaginationParams): Promise<PageResponse<PublicMiniature>> => {
+    const response = await apiClient.get<PageResponse<PublicMiniature>>(
+      '/public/miniatures',
+      { params }
+    )
+    return response.data
+  },
+
+  /**
+   * 공개 미니어처 상세 조회
+   * GET /public/miniatures/{id}
+   */
+  getPublicById: async (id: number): Promise<PublicMiniatureDetail> => {
+    const response = await apiClient.get<PublicMiniatureDetail>(`/public/miniatures/${id}`)
+    return response.data
   },
 }
