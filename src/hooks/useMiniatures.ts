@@ -15,6 +15,8 @@ interface UseMiniatures {
   createMiniature: (data: CreateMiniatureRequest) => Promise<Miniature>
   /** 생성 중 상태 */
   isCreating: boolean
+  /** 단계 일괄 변경 (칸반 드래그) */
+  updateCurrentStep: (id: number, step: string) => Promise<void>
 }
 
 /**
@@ -61,6 +63,31 @@ export function useMiniatures(): UseMiniatures {
     }
   }, [])
 
+  // 단계 일괄 변경 (낙관적 업데이트)
+  const updateCurrentStep = useCallback(async (id: number, step: string) => {
+    // 이전 상태 저장 (롤백용)
+    const previousMiniatures = miniatures
+
+    // 낙관적 업데이트: 즉시 로컬 상태 변경
+    setMiniatures((prev) =>
+      prev.map((m) =>
+        m.id === id ? { ...m, currentStep: step } : m
+      )
+    )
+
+    try {
+      // API 호출
+      const updated = await miniatureApi.updateCurrentStep(id, step)
+      // 서버 응답으로 정확한 값 반영
+      setMiniatures((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, ...updated } : m))
+      )
+    } catch {
+      // 실패 시 롤백
+      setMiniatures(previousMiniatures)
+    }
+  }, [miniatures])
+
   return {
     miniatures,
     isLoading,
@@ -68,5 +95,6 @@ export function useMiniatures(): UseMiniatures {
     refetch: fetchMiniatures,
     createMiniature,
     isCreating,
+    updateCurrentStep,
   }
 }

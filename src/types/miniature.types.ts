@@ -11,6 +11,7 @@ export interface Miniature {
   title: string
   isPublic: boolean
   progress: number
+  currentStep: string
   createdAt: string
   updatedAt: string
 }

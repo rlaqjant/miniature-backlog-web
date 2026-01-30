@@ -54,6 +54,17 @@ export const miniatureApi = {
   },
 
   /**
+   * 단계 일괄 변경 (칸반 드래그)
+   */
+  updateCurrentStep: async (id: number, currentStep: string): Promise<Miniature> => {
+    const response = await apiClient.patch<Miniature>(
+      `/miniatures/${id}/current-step`,
+      { currentStep }
+    )
+    return response.data
+  },
+
+  /**
    * 공개 미니어처 목록 조회
    * GET /public/miniatures
    */

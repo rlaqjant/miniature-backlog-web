@@ -34,8 +34,10 @@ function getStatusBadge(progress: number) {
 /**
  * 날짜 포맷팅
  */
-function formatDate(dateString: string): string {
+function formatDate(dateString: string | undefined | null): string {
+  if (!dateString) return '-'
   const date = new Date(dateString)
+  if (isNaN(date.getTime())) return '-'
   return date.toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'short',
