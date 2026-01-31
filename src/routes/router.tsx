@@ -1,8 +1,9 @@
 import { createBrowserRouter } from 'react-router'
 import { MainLayout } from '@/components/layout'
-import { HomePage, NotFoundPage, LoginPage, RegisterPage, DashboardPage, MiniatureDetailPage, PublicBoardPage, PublicMiniatureDetailPage } from '@/pages'
+import { HomePage, NotFoundPage, LoginPage, RegisterPage, DashboardPage, MiniatureDetailPage, PublicBoardPage, PublicMiniatureDetailPage, AdminPage } from '@/pages'
 import { ProtectedRoute } from './ProtectedRoute'
 import { GuestRoute } from './GuestRoute'
+import { AdminRoute } from './AdminRoute'
 
 /**
  * 애플리케이션 라우터 정의
@@ -53,6 +54,17 @@ export const router = createBrowserRouter([
           {
             path: 'board/:miniatureId',
             element: <PublicMiniatureDetailPage />,
+          },
+        ],
+      },
+
+      // 관리자 전용 라우트
+      {
+        element: <AdminRoute />,
+        children: [
+          {
+            path: 'admin',
+            element: <AdminPage />,
           },
         ],
       },

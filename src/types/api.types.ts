@@ -38,3 +38,19 @@ export interface PaginationParams {
   page?: number
   size?: number
 }
+
+/**
+ * 미니어처 검색 + 페이지네이션 요청 파라미터
+ */
+export interface MiniatureSearchParams extends PaginationParams {
+  title?: string
+  author?: string
+}
+
+/**
+ * 사용자 검색 + 페이지네이션 요청 파라미터
+ */
+export interface UserSearchParams extends PaginationParams {
+  email?: string
+  nickname?: string
+}
