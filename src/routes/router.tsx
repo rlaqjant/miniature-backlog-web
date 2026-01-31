@@ -19,6 +19,14 @@ export const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
+      {
+        path: 'board',
+        element: <PublicBoardPage />,
+      },
+      {
+        path: 'board/:miniatureId',
+        element: <PublicMiniatureDetailPage />,
+      },
 
       // 비로그인 사용자 전용 라우트
       {
@@ -46,14 +54,6 @@ export const router = createBrowserRouter([
           {
             path: 'miniatures/:id',
             element: <MiniatureDetailPage />,
-          },
-          {
-            path: 'board',
-            element: <PublicBoardPage />,
-          },
-          {
-            path: 'board/:miniatureId',
-            element: <PublicMiniatureDetailPage />,
           },
         ],
       },

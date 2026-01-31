@@ -45,21 +45,19 @@ export function Header() {
 
           {/* 데스크톱 네비게이션 */}
           <nav className="hidden lg:flex items-center gap-8">
+            <Link
+              to="/board"
+              className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
+            >
+              공개 게시판
+            </Link>
             {isAuthenticated && (
-              <>
-                <Link
-                  to="/board"
-                  className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
-                >
-                  공개 게시판
-                </Link>
-                <Link
-                  to="/dashboard"
-                  className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
-                >
-                  내 백로그
-                </Link>
-              </>
+              <Link
+                to="/dashboard"
+                className="text-charcoal-500 hover:text-forest-500 transition-colors font-medium dark:text-cream-200 dark:hover:text-forest-400"
+              >
+                내 백로그
+              </Link>
             )}
           </nav>
 
@@ -112,30 +110,30 @@ export function Header() {
           {/* 메뉴 패널 */}
           <nav className="fixed top-[72px] left-0 right-0 z-50 border-b border-cream-200 bg-cream-50 px-6 py-4 lg:hidden dark:border-charcoal-600 dark:bg-[#1a1814]">
             <div className="flex flex-col gap-2">
+              {isAuthenticated && (
+                /* 사용자 정보 (sm 미만에서만 표시) */
+                <div className="sm:hidden flex items-center justify-between rounded-lg px-4 py-3 mb-1 border-b border-cream-200 dark:border-charcoal-600">
+                  <span className="text-sm font-medium text-charcoal-500 dark:text-cream-200">
+                    {user?.nickname}님
+                  </span>
+                  <Button variant="outline" size="sm" onClick={logout}>
+                    로그아웃
+                  </Button>
+                </div>
+              )}
+              <Link
+                to="/board"
+                className="rounded-lg px-4 py-3 text-base font-medium text-charcoal-700 hover:bg-cream-200 transition-colors dark:text-cream-200 dark:hover:bg-charcoal-600"
+              >
+                공개 게시판
+              </Link>
               {isAuthenticated ? (
-                <>
-                  {/* 사용자 정보 (sm 미만에서만 표시) */}
-                  <div className="sm:hidden flex items-center justify-between rounded-lg px-4 py-3 mb-1 border-b border-cream-200 dark:border-charcoal-600">
-                    <span className="text-sm font-medium text-charcoal-500 dark:text-cream-200">
-                      {user?.nickname}님
-                    </span>
-                    <Button variant="outline" size="sm" onClick={logout}>
-                      로그아웃
-                    </Button>
-                  </div>
-                  <Link
-                    to="/board"
-                    className="rounded-lg px-4 py-3 text-base font-medium text-charcoal-700 hover:bg-cream-200 transition-colors dark:text-cream-200 dark:hover:bg-charcoal-600"
-                  >
-                    공개 게시판
-                  </Link>
-                  <Link
-                    to="/dashboard"
-                    className="rounded-lg px-4 py-3 text-base font-medium text-charcoal-700 hover:bg-cream-200 transition-colors dark:text-cream-200 dark:hover:bg-charcoal-600"
-                  >
-                    내 백로그
-                  </Link>
-                </>
+                <Link
+                  to="/dashboard"
+                  className="rounded-lg px-4 py-3 text-base font-medium text-charcoal-700 hover:bg-cream-200 transition-colors dark:text-cream-200 dark:hover:bg-charcoal-600"
+                >
+                  내 백로그
+                </Link>
               ) : (
                 <>
                   <Link

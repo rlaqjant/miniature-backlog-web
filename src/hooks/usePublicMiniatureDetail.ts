@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { miniatureApi, progressLogApi } from '@/services/api'
+import { miniatureApi, progressLogApi, likeApi } from '@/services/api'
+import { useAuthStore } from '@/stores'
 import type { PublicMiniatureDetail, ProgressLogResponse } from '@/types'
 
 interface UsePublicMiniatureDetail {
@@ -13,10 +14,12 @@ interface UsePublicMiniatureDetail {
   error: string | null
   /** 데이터 새로고침 */
   refetch: () => Promise<void>
+  /** 좋아요 토글 */
+  toggleLike: () => Promise<void>
 }
 
 /**
- * 공개 미니어처 상세 정보 조회 훅 (읽기 전용)
+ * 공개 미니어처 상세 정보 조회 훅 (좋아요 토글 포함)
  */
 export function usePublicMiniatureDetail(id: number): UsePublicMiniatureDetail {
   const [miniature, setMiniature] = useState<PublicMiniatureDetail | null>(null)
@@ -50,11 +53,37 @@ export function usePublicMiniatureDetail(id: number): UsePublicMiniatureDetail {
     fetchDetail()
   }, [fetchDetail])
 
+  /**
+   * 좋아요 토글 (낙관적 업데이트)
+   */
+  const toggleLike = useCallback(async () => {
+    const { isAuthenticated } = useAuthStore.getState()
+    if (!isAuthenticated || !miniature) return
+
+    // 낙관적 업데이트
+    const prevLiked = miniature.liked
+    const prevCount = miniature.likeCount
+    const newLiked = !prevLiked
+    const newCount = newLiked ? prevCount + 1 : prevCount - 1
+
+    setMiniature(prev => prev ? { ...prev, liked: newLiked, likeCount: newCount } : prev)
+
+    try {
+      const response = await likeApi.toggle(id)
+      // 서버 응답으로 최종 상태 반영
+      setMiniature(prev => prev ? { ...prev, liked: response.liked, likeCount: response.likeCount } : prev)
+    } catch {
+      // 실패 시 롤백
+      setMiniature(prev => prev ? { ...prev, liked: prevLiked, likeCount: prevCount } : prev)
+    }
+  }, [id, miniature])
+
   return {
     miniature,
     progressLogs,
     isLoading,
     error,
     refetch: fetchDetail,
+    toggleLike,
   }
 }

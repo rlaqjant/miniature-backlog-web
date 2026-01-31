@@ -60,10 +60,12 @@ export interface UpdateBacklogItemRequest {
 }
 
 /**
- * 공개 미니어처 목록 응답 (작성자 정보 포함)
+ * 공개 미니어처 목록 응답 (작성자 정보 + 좋아요 포함)
  */
 export interface PublicMiniature extends Miniature {
   userNickname: string
+  likeCount: number
+  liked: boolean
 }
 
 /**
@@ -71,4 +73,6 @@ export interface PublicMiniature extends Miniature {
  */
 export interface PublicMiniatureDetail extends MiniatureDetail {
   userNickname: string
+  likeCount: number
+  liked: boolean
 }
