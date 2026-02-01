@@ -32,70 +32,93 @@ function getStatusBadge(progress: number) {
 }
 
 /**
- * 날짜 포맷팅
- */
-function formatDate(dateString: string | undefined | null): string {
-  if (!dateString) return '-'
-  const date = new Date(dateString)
-  if (isNaN(date.getTime())) return '-'
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
-}
-
-/**
  * 공개 미니어처 카드 컴포넌트
- * 제목, 상태 배지, 진행률 바, 작성자 닉네임, 날짜 표시
+ * 이미지 포함 카드 디자인
  */
 export function PublicMiniatureCard({ miniature, onClick }: PublicMiniatureCardProps) {
-  const { id, title, progress, updatedAt, userNickname, likeCount, liked } = miniature
+  const { id, title, progress, userNickname, likeCount, liked, thumbnailUrl } = miniature
   const statusBadge = getStatusBadge(progress)
 
   return (
     <Card
       className="cursor-pointer group"
+      padding="none"
       hoverable
       onClick={() => onClick(id)}
     >
-      <div className="p-5">
-        {/* 헤더: 제목 + 상태 배지 */}
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <h3 className="font-display line-clamp-2 flex-1 text-lg font-semibold text-charcoal-900 group-hover:text-forest-500 transition-colors dark:text-cream-50">
-            {title}
-          </h3>
+      {/* 이미지 영역 */}
+      {thumbnailUrl ? (
+        <div className="h-48 overflow-hidden">
+          <img
+            src={thumbnailUrl}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+      ) : (
+        <div className="flex h-48 items-center justify-center bg-cream-200 dark:bg-charcoal-600">
+          <svg
+            className="h-12 w-12 text-cream-400 dark:text-charcoal-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21zm14.25-14.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+            />
+          </svg>
+        </div>
+      )}
+
+      {/* 본문 */}
+      <div className="flex flex-col gap-3 p-5">
+        {/* 제목 */}
+        <h3 className="font-display line-clamp-1 text-[15px] font-semibold text-charcoal-900 group-hover:text-forest-500 transition-colors dark:text-cream-50">
+          {title}
+        </h3>
+
+        {/* 메타: 아바타+닉네임 (좌) / 하트+좋아요수 (우) */}
+        <div className="flex items-center justify-between text-xs text-stone-500">
+          <span className="flex items-center gap-1.5">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-forest-100 text-[10px] font-bold text-forest-600 dark:bg-forest-900/30 dark:text-forest-300">
+              {userNickname.charAt(0).toUpperCase()}
+            </span>
+            <span className="font-medium text-charcoal-500 dark:text-cream-300">
+              {userNickname}
+            </span>
+          </span>
+          <span className="flex items-center gap-1">
+            <HeartIcon filled={liked} className="h-3.5 w-3.5" />
+            {likeCount > 0 && (
+              <span className={liked ? 'text-rose-500' : ''}>{likeCount}</span>
+            )}
+          </span>
+        </div>
+
+        {/* 상태 태그 배지 */}
+        <div>
           <span
-            className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-medium ${statusBadge.className}`}
+            className={`inline-block rounded-md px-2.5 py-1 text-xs font-medium ${statusBadge.className}`}
           >
             {statusBadge.text}
           </span>
         </div>
 
-        {/* 진행률 바 */}
-        <div className="mb-4">
-          <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="text-stone-500">진행률</span>
-            <span className="font-semibold text-charcoal-500 dark:text-cream-200">
-              {progress}%
-            </span>
+        {/* 진행률 바 (진행 중인 경우만) */}
+        {progress > 0 && progress < 100 && (
+          <div>
+            <div className="mb-1.5 flex items-center justify-between text-xs">
+              <span className="text-stone-500">진행률</span>
+              <span className="font-semibold text-charcoal-500 dark:text-cream-200">
+                {progress}%
+              </span>
+            </div>
+            <ProgressBar value={progress} size="sm" />
           </div>
-          <ProgressBar value={progress} size="sm" />
-        </div>
-
-        {/* 푸터: 작성자 + 좋아요 + 날짜 */}
-        <div className="flex items-center justify-between text-xs text-stone-500">
-          <span className="font-medium text-charcoal-500 dark:text-cream-300">
-            {userNickname}
-          </span>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1">
-              <HeartIcon filled={liked} className="h-3.5 w-3.5" />
-              {likeCount > 0 && likeCount}
-            </span>
-            <span>{formatDate(updatedAt)}</span>
-          </div>
-        </div>
+        )}
       </div>
     </Card>
   )
